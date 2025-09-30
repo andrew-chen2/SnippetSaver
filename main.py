@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
 from sqlite3 import connect
 import re
 
@@ -44,9 +44,21 @@ app = Flask(__name__)
 def index():
     return render_template('index.html')
 
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    return render_template('login.html')
+    if request.method == 'GET':
+        return render_template('login.html')
+    elif request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        sql = "SELECT * FROM users WHERE username = ? AND password = ?"
+        cur = con.execute(sql, (username, password))
+        user = cur.fetchone()
+        if user:
+            return redirect(url_for('index'))
+        else:
+            return render_template('login.html', error="Invalid username or password.")
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():

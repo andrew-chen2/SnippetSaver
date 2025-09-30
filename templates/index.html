@@ -6,6 +6,10 @@
     <title>SnippetSaver</title>
 </head>
 <body>
-    Hello, World!
+    {% if username %}
+    <h2>Welcome, {{ username }}!</h2>
+    {% else %}
+    <h2>Welcome to SnippetSaver</h2>
+    {% endif %}
 </body>
 </html>
