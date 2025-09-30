@@ -1,12 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SnippetSaver</title>
-</head>
-<body>
-    <nav>
+{% extends 'base.html' %}
+
+{%block title %}SnippetSaver{% endblock %}
+
+{% block content %}
+    <nav style="display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 20px;">
         {% if username %}
         <form action="/logout" method="post" style="display:inline;">
             <button type="submit">Logout</button>
@@ -20,5 +17,4 @@
     {% else %}
     <h2>Welcome to SnippetSaver</h2>
     {% endif %}
-</body>
-</html>
+{% endblock %}
