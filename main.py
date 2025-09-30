@@ -1,8 +1,12 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, g
 from sqlite3 import connect
 import re
 
-con = connect('snippetsaver.db')
+def get_db():
+    db = getattr(g, '_database', None)
+    if db is None:
+        db = g._database = connect('snippetsaver.db')
+    return db
 
 def create_table(name: str, columns: dict):
     '''
@@ -14,6 +18,7 @@ def create_table(name: str, columns: dict):
 
     cols: column_name PROPERTY1 PROPERTY2, some_other_column PROPERTY1 PROPERTY2 ...
     '''
+    con = get_db()
     cols = ', '.join([f"{col} {' '.join(props)}" for col, props in columns.items()])
     sql = f"CREATE TABLE IF NOT EXISTS {name} ({cols})"
     con.execute(sql)
@@ -40,6 +45,13 @@ def init_tables():
 
 app = Flask(__name__)
 
+# Close db connection when the context is destroyed
+@app.teardown_appcontext
+def close_connection(exception):
+    db = getattr(g, '_database', None)
+    if db is not None:
+        db.close()
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -49,6 +61,7 @@ def login():
     if request.method == 'GET':
         return render_template('login.html')
     elif request.method == 'POST':
+        con = get_db()
         username = request.form['username']
         password = request.form['password']
 
@@ -65,6 +78,7 @@ def register():
     if request.method == 'GET':
         return render_template('register.html')
     elif request.method == 'POST':
+        con = get_db()
         username = request.form['username']
         password = request.form['password']
 
