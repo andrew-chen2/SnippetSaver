@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, g
+from flask import Flask, render_template, request, redirect, url_for, g, session
 from sqlite3 import connect
 import re
 
@@ -54,7 +54,7 @@ def close_connection(exception):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', username=session.get('username'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -69,6 +69,7 @@ def login():
         cur = con.execute(sql, (username, password))
         user = cur.fetchone()
         if user:
+            session['username'] = username
             return redirect(url_for('index'))
         else:
             return render_template('login.html', error="Invalid username or password.")
@@ -107,7 +108,14 @@ def register():
         sql = "INSERT INTO users (username, password) VALUES (?, ?)"
         con.execute(sql, (username, password))
         con.commit()
-        return "User registered successfully!"
+        
+        session['username'] = username
+        return redirect(url_for('index'))
+    
+@app.route('/logout', methods=['POST'])
+def logout():
+    session.pop('username', None)
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run(debug=True)
