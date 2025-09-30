@@ -1,20 +1,11 @@
 {% extends 'base.html' %}
 
-{%block title %}SnippetSaver{% endblock %}
+{% block title %}SnippetSaver{% endblock %}
 
 {% block content %}
-    <nav style="display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 20px;">
-        {% if username %}
-        <form action="/logout" method="post" style="display:inline;">
-            <button type="submit">Logout</button>
-        </form>
-        {% else %}
-        <a href="/login">Login</a> | <a href="/register">Register</a>
-        {% endif %}
-    </nav>
     {% if username %}
     <h2>Welcome, {{ username }}!</h2>
     {% else %}
-    <h2>Welcome to SnippetSaver</h2>
+    <h2>Welcome to SnippetSaver!</h2>
     {% endif %}
 {% endblock %}
