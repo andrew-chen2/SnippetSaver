@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, g, session
 from sqlite3 import connect
 import re
+import os
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -44,6 +45,7 @@ def init_tables():
     create_table('snippets', snippet_columns)
 
 app = Flask(__name__)
+app.secret_key = os.urandom(24)
 
 # Close db connection when the context is destroyed
 @app.teardown_appcontext
