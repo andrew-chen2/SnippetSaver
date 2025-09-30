@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from sqlite3 import connect
 
 con = connect('snippetsaver.db')
@@ -47,9 +47,17 @@ def index():
 def login():
     return render_template('login.html')
 
-@app.route('/register')
+@app.route('/register', methods=['GET', 'POST'])
 def register():
-    return render_template('register.html')
+    if request.method == 'GET':
+        return render_template('register.html')
+    elif request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        sql = "INSERT INTO users (username, password) VALUES (?, ?)"
+        con.execute(sql, (username, password))
+        con.commit()
+        return "User registered successfully!"
 
 if __name__ == '__main__':
     init_tables()
