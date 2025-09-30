@@ -54,6 +54,16 @@ def register():
     elif request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        if username.strip() == '' or password.strip() == '':
+            return render_template('register.html', error="Username and password cannot be empty.")
+        if len(password) < 6:
+            return render_template('register.html', error="Password must be at least 6 characters long.")
+        if len(username) < 3:
+            return render_template('register.html', error="Username must be at least 3 characters long.")
+        if len(password) > 64:
+            return render_template('register.html', error="Password cannot be longer than 64 characters.")
+        if len(username) > 20:
+            return render_template('register.html', error="Username cannot be longer than 20 characters.")
         sql = "INSERT INTO users (username, password) VALUES (?, ?)"
         con.execute(sql, (username, password))
         con.commit()
