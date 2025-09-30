@@ -11,6 +11,8 @@ def init_tables():
             password TEXT NOT NULL
         )
     '''
+    con.execute(sql)
+    con.commit()
 
 app = Flask(__name__)
 
