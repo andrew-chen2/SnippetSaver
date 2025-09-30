@@ -3,16 +3,28 @@ from sqlite3 import connect
 
 con = connect('snippetsaver.db')
 
-def init_tables():
-    sql = '''
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT NOT NULL UNIQUE,
-            password TEXT NOT NULL
-        )
+def create_table(name: str, columns: dict):
     '''
+    columns: {
+        'column_name': ['PROPERTY1', 'PROPERTY2'],
+        'some_other_column': ['PROPERTY1', 'PROPERTY2', ...],
+        ...
+    }
+
+    cols: column_name PROPERTY1 PROPERTY2, some_other_column PROPERTY1 PROPERTY2 ...
+    '''
+    cols = ', '.join([f"{col} {' '.join(props)}" for col, props in columns.items()])
+    sql = f"CREATE TABLE IF NOT EXISTS {name} ({cols})"
     con.execute(sql)
-    con.commit()
+
+def init_tables():
+    user_columns = {
+        'id': ['INTEGER', 'PRIMARY KEY', 'AUTOINCREMENT'],
+        'username': ['TEXT', 'UNIQUE', 'NOT NULL'],
+        'password': ['TEXT', 'NOT NULL']
+    }
+
+    create_table('users', user_columns)
 
 app = Flask(__name__)
 
