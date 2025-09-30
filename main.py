@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 from sqlite3 import connect
+import re
 
 con = connect('snippetsaver.db')
 
@@ -64,6 +65,9 @@ def register():
             return render_template('register.html', error="Password cannot be longer than 64 characters.")
         if len(username) > 20:
             return render_template('register.html', error="Username cannot be longer than 20 characters.")
+        regex = "^[a-zA-Z0-9_]+$"
+        if not re.match(regex, username):
+            return render_template('register.html', error="Username can only contain letters, numbers, and underscores.")
         sql = "INSERT INTO users (username, password) VALUES (?, ?)"
         con.execute(sql, (username, password))
         con.commit()
