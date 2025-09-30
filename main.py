@@ -55,6 +55,8 @@ def register():
     elif request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+
+        # Input validation
         if username.strip() == '' or password.strip() == '':
             return render_template('register.html', error="Username and password cannot be empty.")
         if len(password) < 6:
@@ -68,6 +70,14 @@ def register():
         regex = "^[a-zA-Z0-9_]+$"
         if not re.match(regex, username):
             return render_template('register.html', error="Username can only contain letters, numbers, and underscores.")
+        
+        # Check if user(name) already exists
+        sql = "Select 1 FROM users WHERE username = ?"
+        cur = con.execute(sql, (username,))
+        if cur.fetchone() is not None:
+            return render_template('register.html', error="Username already taken.")
+
+        # Store in database
         sql = "INSERT INTO users (username, password) VALUES (?, ?)"
         con.execute(sql, (username, password))
         con.commit()
