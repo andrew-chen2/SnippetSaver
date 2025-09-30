@@ -24,7 +24,18 @@ def init_tables():
         'password': ['TEXT', 'NOT NULL']
     }
 
+    snippet_columns = {
+        'id': ['INTEGER', 'PRIMARY KEY', 'AUTOINCREMENT'],
+        'user_id': ['INTEGER', 'NOT NULL'],
+        'title': ['TEXT', 'NOT NULL'],
+        'code': ['TEXT', 'NOT NULL'],
+        'language': ['TEXT'],
+        'created_at': ['TIMESTAMP', 'DEFAULT CURRENT_TIMESTAMP'],
+        'FOREIGN KEY(user_id)': ['REFERENCES users(id)']
+    }
+
     create_table('users', user_columns)
+    create_table('snippets', snippet_columns)
 
 app = Flask(__name__)
 
