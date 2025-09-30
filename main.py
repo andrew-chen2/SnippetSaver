@@ -110,5 +110,5 @@ def register():
         return "User registered successfully!"
 
 if __name__ == '__main__':
-    init_tables()
     app.run(debug=True)
+    init_tables()
