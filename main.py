@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, g, session
 from sqlite3 import connect
-import re
 import os
+from auth import Auth
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -65,18 +65,10 @@ def login():
     if request.method == 'GET':
         return render_template('login.html')
     elif request.method == 'POST':
-        con = get_db()
         username = request.form['username']
         password = request.form['password']
 
-        sql = "SELECT * FROM users WHERE username = ? AND password = ?"
-        cur = con.execute(sql, (username, password))
-        user = cur.fetchone()
-        if user:
-            session['username'] = username
-            return redirect(url_for('index'))
-        else:
-            return render_template('login.html', error="Invalid username or password.")
+        return auth.login(username, password)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -85,44 +77,16 @@ def register():
     if request.method == 'GET':
         return render_template('register.html')
     elif request.method == 'POST':
-        con = get_db()
         username = request.form['username']
         password = request.form['password']
 
-        # Input validation
-        if username.strip() == '' or password.strip() == '':
-            return render_template('register.html', error="Username and password cannot be empty.")
-        regex = "^[a-zA-Z0-9_]+$"
-        if not re.match(regex, username):
-            return render_template('register.html', error="Username can only contain letters, numbers, and underscores.")
-        if len(password) < 6:
-            return render_template('register.html', error="Password must be at least 6 characters long.")
-        if len(username) < 3:
-            return render_template('register.html', error="Username must be at least 3 characters long.")
-        if len(password) > 64:
-            return render_template('register.html', error="Password cannot be longer than 64 characters.")
-        if len(username) > 20:
-            return render_template('register.html', error="Username cannot be longer than 20 characters.")
-        
-        # Check if user(name) already exists
-        sql = "Select 1 FROM users WHERE username = ?"
-        cur = con.execute(sql, (username,))
-        if cur.fetchone() is not None:
-            return render_template('register.html', error="Username already taken.")
-
-        # Store in database
-        sql = "INSERT INTO users (username, password) VALUES (?, ?)"
-        con.execute(sql, (username, password))
-        con.commit()
-        
-        session['username'] = username
-        return redirect(url_for('index'))
+        return auth.register(username, password)
     
 @app.route('/logout', methods=['POST'])
 def logout():
-    session.pop('username', None)
-    return redirect(url_for('index'))
+    return auth.logout()
 
 if __name__ == '__main__':
     app.run(debug=True)
     init_tables()
+    auth = Auth(get_db)
