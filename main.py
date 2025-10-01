@@ -92,6 +92,9 @@ def register():
         # Input validation
         if username.strip() == '' or password.strip() == '':
             return render_template('register.html', error="Username and password cannot be empty.")
+        regex = "^[a-zA-Z0-9_]+$"
+        if not re.match(regex, username):
+            return render_template('register.html', error="Username can only contain letters, numbers, and underscores.")
         if len(password) < 6:
             return render_template('register.html', error="Password must be at least 6 characters long.")
         if len(username) < 3:
@@ -100,9 +103,6 @@ def register():
             return render_template('register.html', error="Password cannot be longer than 64 characters.")
         if len(username) > 20:
             return render_template('register.html', error="Username cannot be longer than 20 characters.")
-        regex = "^[a-zA-Z0-9_]+$"
-        if not re.match(regex, username):
-            return render_template('register.html', error="Username can only contain letters, numbers, and underscores.")
         
         # Check if user(name) already exists
         sql = "Select 1 FROM users WHERE username = ?"
