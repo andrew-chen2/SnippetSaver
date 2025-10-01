@@ -1,7 +1,7 @@
-from flask import Flask, render_template, request, redirect, url_for, g, session
+from flask import Flask, render_template, request, g, session
 from sqlite3 import connect
 import os
-from auth import Auth
+from auth import Auth, only_authenticated, only_unauthenticated
 from database import init_tables
 
 def get_db():
@@ -27,9 +27,8 @@ def index():
     return render_template('index.html', username=session.get('username'))
 
 @app.route('/login', methods=['GET', 'POST'])
+@only_unauthenticated
 def login():
-    if session.get('username'):
-        return redirect(url_for('index'))
     if request.method == 'GET':
         return render_template('login.html')
     elif request.method == 'POST':
@@ -39,9 +38,8 @@ def login():
         return auth.login(username, password)
 
 @app.route('/register', methods=['GET', 'POST'])
+@only_unauthenticated
 def register():
-    if session.get('username'):
-        return redirect(url_for('index'))
     if request.method == 'GET':
         return render_template('register.html')
     elif request.method == 'POST':
