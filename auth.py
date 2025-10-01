@@ -7,6 +7,13 @@ class Auth:
 
     def register(self, username: str, password: str):
         con = self.get_db()
+        
+        # Check if user(name) already exists
+        sql = "Select 1 FROM users WHERE username = ?"
+        cur = con.execute(sql, (username,))
+        if cur.fetchone() is not None:
+            return render_template('register.html', error="Username already taken.")
+        
         # Input validation
         if username.strip() == '' or password.strip() == '':
             return render_template('register.html', error="Username and password cannot be empty.")
@@ -21,12 +28,6 @@ class Auth:
             return render_template('register.html', error="Password cannot be longer than 64 characters.")
         if len(username) > 20:
             return render_template('register.html', error="Username cannot be longer than 20 characters.")
-        
-        # Check if user(name) already exists
-        sql = "Select 1 FROM users WHERE username = ?"
-        cur = con.execute(sql, (username,))
-        if cur.fetchone() is not None:
-            return render_template('register.html', error="Username already taken.")
 
         # Store in database
         sql = "INSERT INTO users (username, password) VALUES (?, ?)"
