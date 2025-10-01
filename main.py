@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, g, session
 from sqlite3 import connect
 import os
 from auth import Auth
+from database import init_tables
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -9,43 +10,10 @@ def get_db():
         db = g._database = connect('snippetsaver.db')
     return db
 
-def create_table(name: str, columns: dict):
-    '''
-    columns: {
-        'column_name': ['PROPERTY1', 'PROPERTY2'],
-        'some_other_column': ['PROPERTY1', 'PROPERTY2', ...],
-        ...
-    }
-
-    cols: column_name PROPERTY1 PROPERTY2, some_other_column PROPERTY1 PROPERTY2 ...
-    '''
-    con = get_db()
-    cols = ', '.join([f"{col} {' '.join(props)}" for col, props in columns.items()])
-    sql = f"CREATE TABLE IF NOT EXISTS {name} ({cols})"
-    con.execute(sql)
-
-def init_tables():
-    user_columns = {
-        'id': ['INTEGER', 'PRIMARY KEY', 'AUTOINCREMENT'],
-        'username': ['TEXT', 'UNIQUE', 'NOT NULL'],
-        'password': ['TEXT', 'NOT NULL']
-    }
-
-    snippet_columns = {
-        'id': ['INTEGER', 'PRIMARY KEY', 'AUTOINCREMENT'],
-        'user_id': ['INTEGER', 'NOT NULL'],
-        'title': ['TEXT', 'NOT NULL'],
-        'code': ['TEXT', 'NOT NULL'],
-        'language': ['TEXT'],
-        'created_at': ['TIMESTAMP', 'DEFAULT CURRENT_TIMESTAMP'],
-        'FOREIGN KEY(user_id)': ['REFERENCES users(id)']
-    }
-
-    create_table('users', user_columns)
-    create_table('snippets', snippet_columns)
-
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
+
+auth = Auth(get_db)
 
 # Close db connection when the context is destroyed
 @app.teardown_appcontext
@@ -89,4 +57,3 @@ def logout():
 if __name__ == '__main__':
     app.run(debug=True)
     init_tables()
-    auth = Auth(get_db)
