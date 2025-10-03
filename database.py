@@ -17,6 +17,7 @@ def init_tables(get_db):
         'title': ['TEXT', 'NOT NULL'],
         'code': ['TEXT', 'NOT NULL'],
         'language': ['TEXT'],
+        'share_id': ['TEXT', 'UNIQUE'],
         'created_at': ['TIMESTAMP', 'DEFAULT CURRENT_TIMESTAMP'],
         'FOREIGN KEY(user_id)': ['REFERENCES users(id)']
     }
