@@ -1,22 +1,6 @@
 from flask import session, redirect, url_for, render_template
 from re import match
 
-def only_authenticated(func):
-    def wrapper(*args, **kwargs):
-        if not session.get('username'):
-            return redirect(url_for('login'))
-        return func(*args, **kwargs)
-    wrapper.__name__ = func.__name__
-    return wrapper
-
-def only_unauthenticated(func):
-    def wrapper(*args, **kwargs):
-        if session.get('username'):
-            return redirect(url_for('index'))
-        return func(*args, **kwargs)
-    wrapper.__name__ = func.__name__
-    return wrapper
-
 class Auth:
     def __init__(self, get_db):
         self.get_db = get_db
@@ -81,3 +65,25 @@ class Auth:
     
     def get_user_id(self):
         return self.user_id
+
+    def get_username(self):
+        return self.username
+
+    def is_authenticated(self):
+        return 'username' in session
+
+    def require_auth(self, func):
+        def wrapper(*args, **kwargs):
+            if not self.is_authenticated():
+                return redirect(url_for('login'))
+            return func(*args, **kwargs)
+        wrapper.__name__ = func.__name__
+        return wrapper
+
+    def require_guest(self, func):
+        def wrapper(*args, **kwargs):
+            if self.is_authenticated():
+                return redirect(url_for('index'))
+            return func(*args, **kwargs)
+        wrapper.__name__ = func.__name__
+        return wrapper
