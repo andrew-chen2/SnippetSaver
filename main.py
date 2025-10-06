@@ -49,6 +49,7 @@ def register():
         return auth.register(username, password)
     
 @app.route('/logout', methods=['POST'])
+@auth.require_auth
 def logout():
     return auth.logout()
 
