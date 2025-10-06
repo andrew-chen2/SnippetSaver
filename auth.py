@@ -20,6 +20,8 @@ def only_unauthenticated(func):
 class Auth:
     def __init__(self, get_db):
         self.get_db = get_db
+        self.username = None
+        self.user_id = None
 
     def register(self, username: str, password: str):
         con = self.get_db()
@@ -47,10 +49,13 @@ class Auth:
 
         # Store in database
         sql = "INSERT INTO users (username, password) VALUES (?, ?)"
-        con.execute(sql, (username, password))
+        cur = con.execute(sql, (username, password))
         con.commit()
         
         session['username'] = username
+        self.username = username
+        self.user_id = cur.lastrowid
+
         return redirect(url_for('index'))
 
     def login(self, username: str, password: str):
@@ -60,10 +65,19 @@ class Auth:
         user = cur.fetchone()
         if user:
             session['username'] = username
+            self.username = username
+            self.user_id = user[0]
+
             return redirect(url_for('index'))
         else:
             return render_template('login.html', error="Invalid username or password.")
         
     def logout(self):
         session.pop('username', None)
+        self.username = None
+        self.user_id = None
+
         return redirect(url_for('index'))
+    
+    def get_user_id(self):
+        return self.user_id
