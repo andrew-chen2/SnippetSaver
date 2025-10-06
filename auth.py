@@ -1,5 +1,6 @@
 from flask import session, redirect, url_for, render_template
 from re import match
+from werkzeug.security import generate_password_hash, check_password_hash
 
 class Auth:
     def __init__(self, get_db):
@@ -33,7 +34,7 @@ class Auth:
 
         # Store in database
         sql = "INSERT INTO users (username, password) VALUES (?, ?)"
-        cur = con.execute(sql, (username, password))
+        cur = con.execute(sql, (username, generate_password_hash(password)))
         con.commit()
         
         session['username'] = username
@@ -44,10 +45,11 @@ class Auth:
 
     def login(self, username: str, password: str):
         con = self.get_db()
-        sql = "SELECT * FROM users WHERE username = ? AND password = ?"
-        cur = con.execute(sql, (username, password))
+        sql = "SELECT * FROM users WHERE username = ?"
+        cur = con.execute(sql, (username))
         user = cur.fetchone()
-        if user:
+        _, _, hashed_password = user if user else (None, None, None)
+        if user and check_password_hash(hashed_password, password):
             session['username'] = username
             self.username = username
             self.user_id = user[0]
