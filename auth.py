@@ -46,9 +46,9 @@ class Auth:
     def login(self, username: str, password: str):
         con = self.get_db()
         sql = "SELECT * FROM users WHERE username = ?"
-        cur = con.execute(sql, (username))
+        cur = con.execute(sql, (username,))
         user = cur.fetchone()
-        _, _, hashed_password = user if user else (None, None, None)
+        *_, hashed_password = user if user else (None, None, None)
         if user and check_password_hash(hashed_password, password):
             session['username'] = username
             self.username = username
