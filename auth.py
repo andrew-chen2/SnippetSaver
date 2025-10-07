@@ -1,12 +1,15 @@
 from flask import session, redirect, url_for, render_template
 from re import match
 from werkzeug.security import generate_password_hash, check_password_hash
+import datetime
 
 class Auth:
     def __init__(self, get_db):
         self.get_db = get_db
         self.username = None
         self.user_id = None
+        self.failed_attempts = 0
+        self.last_login_at = None
 
     def register(self, username: str, password: str):
         con = self.get_db()
@@ -40,6 +43,7 @@ class Auth:
         session['username'] = username
         self.username = username
         self.user_id = cur.lastrowid
+        self.last_login_at = datetime.datetime.now()
 
         return redirect(url_for('index'))
 
@@ -53,9 +57,13 @@ class Auth:
             session['username'] = username
             self.username = username
             self.user_id = user[0]
+            self.last_login_at = datetime.datetime.now()
+            self.failed_attempts = 0
 
             return redirect(url_for('index'))
         else:
+            self.failed_attempts += 1
+            
             return render_template('login.html', error="Invalid username or password.")
         
     def logout(self):
