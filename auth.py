@@ -71,12 +71,13 @@ class Auth:
     def get_username(self):
         return self.username
 
+    @property
     def is_authenticated(self):
         return 'username' in session
 
     def require_auth(self, func):
         def wrapper(*args, **kwargs):
-            if not self.is_authenticated():
+            if not self.is_authenticated:
                 return redirect(url_for('login'))
             return func(*args, **kwargs)
         wrapper.__name__ = func.__name__
@@ -84,7 +85,7 @@ class Auth:
 
     def require_guest(self, func):
         def wrapper(*args, **kwargs):
-            if self.is_authenticated():
+            if self.is_authenticated:
                 return redirect(url_for('index'))
             return func(*args, **kwargs)
         wrapper.__name__ = func.__name__
