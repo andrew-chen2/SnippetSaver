@@ -24,3 +24,15 @@ def levenshtein_dist(str1: str, str2: str) -> int:
                     dp[i-1][j-1]
                 )
     return dp[m][n]
+
+def fuzzy_search(haystack: str, needle: str, max_dist: int) -> str:
+    haystack_len = len(haystack)
+    needle_len = len(needle)
+    
+    for i in range(haystack_len - needle_len + 1):
+        sub_str = haystack[i:i+needle_len]
+
+        if levenshtein_dist(sub_str, needle) <= max_dist:
+            return sub_str
+        
+    return ''
