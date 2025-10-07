@@ -1,0 +1,30 @@
+function LevenshteinDistance(char s[1.. m], char t[1.. n]):
+    // Initialize a matrix d of size (m+1) x (n+1)
+    declare int d[0.. m, 0.. n]
+
+    // Initialize the first row and column
+    // The distance from an empty string to a prefix of length i is i (i deletions)
+    for i from 0 to m:
+        d[i, 0] := i
+    // The distance from an empty string to a prefix of length j is j (j insertions)
+    for j from 0 to n:
+        d[0, j] := j
+
+    // Fill the matrix
+    for i from 1 to m:
+        for j from 1 to n:
+            // Cost of substitution is 1 if characters differ, 0 if they are the same
+            if s[i] = t[j]:
+                substitutionCost := 0
+            else:
+                substitutionCost := 1
+
+            // Calculate the minimum cost using the three operations
+            d[i, j] := minimum(
+                            d[i-1, j] + 1,      // Deletion: delete char from s
+                            d[i, j-1] + 1,      // Insertion: insert char into s
+                            d[i-1, j-1] + substitutionCost // Substitution
+                         )
+
+    // The final Levenshtein distance is in the bottom-right cell of the matrix
+    return d[m, n]

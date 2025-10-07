@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, g, session
 from sqlite3 import connect
 import os
 from auth import Auth
-from database import init_tables
+from database import init_tables, delete_rows
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -21,6 +21,12 @@ def close_connection(exception):
     db = getattr(g, '_database', None)
     if db is not None:
         db.close()
+
+@app.cli.command('resetdb')
+def resetdb():
+    init_tables()
+    delete_rows(['users', 'snippets'])
+    print("Database reset.")
 
 @app.route('/')
 def index():
@@ -55,4 +61,3 @@ def logout():
 
 if __name__ == '__main__':
     app.run(debug=True)
-    init_tables()
