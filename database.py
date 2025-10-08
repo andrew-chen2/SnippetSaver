@@ -23,6 +23,7 @@ def init_tables():
         'language': ['TEXT'],
         'share_id': ['TEXT', 'UNIQUE'],
         'created_at': ['TIMESTAMP', 'DEFAULT CURRENT_TIMESTAMP'],
+        'modified_at': ['TIMESTAMP', 'DEFAULT CURRENT_TIMESTAMP'],
         'FOREIGN KEY(user_id)': ['REFERENCES users(id)']
     }
 
