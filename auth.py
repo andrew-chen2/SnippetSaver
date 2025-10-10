@@ -63,12 +63,6 @@ class Auth:
 
         return redirect(url_for('index'))
     
-    def get_user_id(self):
-        return self.user_id
-
-    def get_username(self):
-        return self.username
-
     def is_authenticated(self):
         return 'username' in session
 
