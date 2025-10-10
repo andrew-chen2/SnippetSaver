@@ -26,9 +26,9 @@ def detect_html_snippets(code: str) -> list:
 
     return snippets
 
-print(detect_html_snippets(
+""" print(detect_html_snippets(
 
-    """
+    '''
 <!DOCTYPE html>
 <html>
 <head>
@@ -60,5 +60,5 @@ print(detect_html_snippets(
     </footer>
 </body>
 </html>
-"""
-))
+'''
+)) """
