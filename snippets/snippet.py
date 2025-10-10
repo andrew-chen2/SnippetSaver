@@ -1,5 +1,6 @@
 import datetime
 import uuid
+from snippets.detectors.detector import detect_snippets
 
 class Snippet:
     def __init__(self, get_db, user_id, snippet_id = None):
@@ -23,8 +24,9 @@ class Snippet:
             self.share_id = None
 
     def get_snippets_from_code(self) -> list:
-        # Returns list of detected snippets as strings
-        pass
+        if not self.full_code.strip():
+            return []
+        return detect_snippets(self.full_code, self.language)
 
     def save_snippet(self):
         con = self.get_db()
@@ -65,7 +67,7 @@ class Snippet:
 
     def generate_share_id(self):
         if self.share_id:
-            return self.share_id # Already has a share_id
+            return # Already has a share_id
 
         con = self.get_db()
         new_share_id = str(uuid.uuid4())
