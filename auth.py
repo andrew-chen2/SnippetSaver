@@ -1,11 +1,15 @@
 from flask import session, redirect, url_for, render_template
 from re import match
+from werkzeug.security import generate_password_hash, check_password_hash
+import datetime
 
 class Auth:
     def __init__(self, get_db):
         self.get_db = get_db
         self.username = None
         self.user_id = None
+        self.failed_attempts = 0
+        self.last_login_at = None
 
     def register(self, username: str, password: str):
         con = self.get_db()
@@ -33,27 +37,33 @@ class Auth:
 
         # Store in database
         sql = "INSERT INTO users (username, password) VALUES (?, ?)"
-        cur = con.execute(sql, (username, password))
+        cur = con.execute(sql, (username, generate_password_hash(password)))
         con.commit()
         
         session['username'] = username
         self.username = username
         self.user_id = cur.lastrowid
+        self.last_login_at = datetime.datetime.now()
 
         return redirect(url_for('index'))
 
     def login(self, username: str, password: str):
         con = self.get_db()
-        sql = "SELECT * FROM users WHERE username = ? AND password = ?"
-        cur = con.execute(sql, (username, password))
+        sql = "SELECT * FROM users WHERE username = ?"
+        cur = con.execute(sql, (username,))
         user = cur.fetchone()
-        if user:
+        *_, hashed_password = user if user else (None, None, None)
+        if user and check_password_hash(hashed_password, password):
             session['username'] = username
             self.username = username
             self.user_id = user[0]
+            self.last_login_at = datetime.datetime.now()
+            self.failed_attempts = 0
 
             return redirect(url_for('index'))
         else:
+            self.failed_attempts += 1
+            
             return render_template('login.html', error="Invalid username or password.")
         
     def logout(self):
@@ -63,12 +73,19 @@ class Auth:
 
         return redirect(url_for('index'))
     
+    def get_user_id(self):
+        return self.user_id
+
+    def get_username(self):
+        return self.username
+
+    @property
     def is_authenticated(self):
         return 'username' in session
 
     def require_auth(self, func):
         def wrapper(*args, **kwargs):
-            if not self.is_authenticated():
+            if not self.is_authenticated:
                 return redirect(url_for('login'))
             return func(*args, **kwargs)
         wrapper.__name__ = func.__name__
@@ -76,7 +93,7 @@ class Auth:
 
     def require_guest(self, func):
         def wrapper(*args, **kwargs):
-            if self.is_authenticated():
+            if self.is_authenticated:
                 return redirect(url_for('index'))
             return func(*args, **kwargs)
         wrapper.__name__ = func.__name__
