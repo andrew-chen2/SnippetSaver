@@ -59,5 +59,13 @@ def register():
 def logout():
     return auth.logout()
 
+@app.route('/new')
+def new():
+    return render_template('new.html')
+
+@app.route('/library')
+def library():
+    return render_template('library.html')
+
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}My Snippets - SnippetSaver{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>My Snippets</h2>
+    <a href="/new" class="btn btn-primary">+ New Snippet</a>
+</div>
+
+<!-- Search and Sort Controls -->
+<form class="row mb-4" method="get" action="/snippets/search">
+    <div class="col-md-8 mb-2">
+        <input type="text" name="q" class="form-control" placeholder="Search snippets..." value="{{ request.args.get('q', '') }}">
+    </div>
+    <div class="col-md-3 mb-2">
+        <select name="sort" class="form-select">
+            <option value="recent" {% if request.args.get('sort') == 'recent' %}selected{% endif %}>Sort by: Most Recent</option>
+            <option value="title" {% if request.args.get('sort') == 'title' %}selected{% endif %}>Sort by: Title (A–Z)</option>
+            <option value="language" {% if request.args.get('sort') == 'language' %}selected{% endif %}>Sort by: Language</option>
+        </select>
+    </div>
+    <div class="col-md-1 mb-2">
+        <button type="submit" class="btn btn-secondary w-100">Go</button>
+    </div>
+</form>
+
+<!-- Snippet List -->
+{% if snippets %}
+    <div class="row row-cols-1 row-cols-md-2 g-3">
+        {% for snippet in snippets %}
+        <div class="col">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h5 class="card-title mb-0">{{ snippet.title }}</h5>
+                        <span class="badge bg-info text-dark">{{ snippet.language }}</span>
+                    </div>
+
+                    <!-- Code Preview -->
+                    <pre class="bg-light border rounded p-2" style="font-family: monospace; max-height: 150px; overflow-y: auto;">
+                        {{ snippet.code.split('\n')[:6] | join('\n') }}{% if snippet.code.split('\n')|length > 6 %}...{% endif %}
+                    </pre>
+
+                    <small class="text-muted">
+                        Created: {{ snippet.created_at.strftime("%Y-%m-%d") }} • 
+                        Modified: {{ snippet.modified_at.strftime("%Y-%m-%d") }}
+                    </small>
+
+                    <div class="d-flex justify-content-between mt-3">
+                        <a href="/snippets/{{ snippet.id }}" class="btn btn-outline-primary btn-sm">View</a>
+                        <a href="/snippets/{{ snippet.id }}/edit" class="btn btn-outline-secondary btn-sm">Edit</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="text-center">
+        No snippets found
+    </div>
+{% endif %}
+{% endblock %}
