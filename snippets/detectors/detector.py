@@ -1,8 +1,8 @@
-from python import detect_python_snippets
-from javascript import detect_javascript_snippets
-from java import detect_java_snippets
-from cpp import detect_cpp_snippets
-from html import detect_html_snippets
+from snippets.detectors.detect_python import detect_python_snippets
+from snippets.detectors.detect_javascript import detect_javascript_snippets
+from snippets.detectors.detect_java import detect_java_snippets
+from snippets.detectors.detect_cpp import detect_cpp_snippets
+from snippets.detectors.detect_html import detect_html_snippets
 
 def detect_snippets(code: str, lang: str) -> list:
     if lang == 'python':
