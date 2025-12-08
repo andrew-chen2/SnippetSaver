@@ -1,4 +1,4 @@
-from flask import session, redirect, url_for, render_template
+from flask import session, redirect, url_for, render_template, flash
 from re import match
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
@@ -18,22 +18,29 @@ class Auth:
         sql = "Select 1 FROM users WHERE username = ?"
         cur = con.execute(sql, (username,))
         if cur.fetchone() is not None:
-            return render_template('register.html', error="Username already taken.")
+            flash('Username already taken.', 'error')
+            return redirect(url_for('register'))
         
         # Input validation
         if username.strip() == '' or password.strip() == '':
-            return render_template('register.html', error="Username and password cannot be empty.")
+            flash('Username and password cannot be empty.', 'error')
+            return redirect(url_for('register'))
         regex = "^[a-zA-Z0-9_]+$"
         if not match(regex, username):
-            return render_template('register.html', error="Username can only contain letters, numbers, and underscores.")
+            flash('Username can only contain letters, numbers, and underscores.', 'error')
+            return redirect(url_for('register'))
         if len(password) < 6:
-            return render_template('register.html', error="Password must be at least 6 characters long.")
+            flash('Password must be at least 6 characters long.', 'error')
+            return redirect(url_for('register'))
         if len(username) < 3:
-            return render_template('register.html', error="Username must be at least 3 characters long.")
+            flash('Username must be at least 3 characters long.', 'error')
+            return redirect(url_for('register'))
         if len(password) > 64:
-            return render_template('register.html', error="Password cannot be longer than 64 characters.")
+            flash('Password cannot be longer than 64 characters.', 'error')
+            return redirect(url_for('register'))
         if len(username) > 20:
-            return render_template('register.html', error="Username cannot be longer than 20 characters.")
+            flash('Username cannot be longer than 20 characters.', 'error')
+            return redirect(url_for('register'))
 
         # Store in database
         sql = "INSERT INTO users (username, password) VALUES (?, ?)"
@@ -54,9 +61,9 @@ class Auth:
         sql = "SELECT * FROM users WHERE username = ?"
         cur = con.execute(sql, (username,))
         user = cur.fetchone()
-        user_id = user[0]
         *_, hashed_password = user if user else (None, None, None)
         if user and check_password_hash(hashed_password, password):
+            user_id = user[0]
             session['username'] = username
             session['user_id'] = user_id
             self.username = username
@@ -68,7 +75,8 @@ class Auth:
         else:
             self.failed_attempts += 1
             
-            return render_template('login.html', error="Invalid username or password.")
+            flash('Invalid username or password.', 'error')
+            return redirect(url_for('login'))
         
     def logout(self):
         session.pop('username', None)

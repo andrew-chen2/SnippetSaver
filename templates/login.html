@@ -15,7 +15,13 @@
             <label for="password" class="form-label">Password</label>
             <input type="password" id="password" name="password" class="form-control" required />
         </div>
-        <p style="color: red;">{{ error }}</p>
+        <p style="color: red;">
+        {% with errors = get_flashed_messages(category_filter=["error"]) %}
+        {% if errors %}
+        {{ errors[0] }}
+        {% endif %}
+        {% endwith %}
+        </p>
         <input type="submit" value="Login" class="btn btn-primary" style="width: 100%;" />
         <div style="display: flex; justify-content: center; gap: 5px; margin-top: 10px;">
             <span>Don't have an account?</span>
