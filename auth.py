@@ -38,11 +38,13 @@ class Auth:
         # Store in database
         sql = "INSERT INTO users (username, password) VALUES (?, ?)"
         cur = con.execute(sql, (username, generate_password_hash(password)))
+        user_id = cur.lastrowid
         con.commit()
         
         session['username'] = username
+        session['user_id'] = user_id
         self.username = username
-        self.user_id = cur.lastrowid
+        self.user_id = user_id
         self.last_login_at = datetime.datetime.now()
 
         return redirect(url_for('index'))
@@ -52,11 +54,13 @@ class Auth:
         sql = "SELECT * FROM users WHERE username = ?"
         cur = con.execute(sql, (username,))
         user = cur.fetchone()
+        user_id = user[0]
         *_, hashed_password = user if user else (None, None, None)
         if user and check_password_hash(hashed_password, password):
             session['username'] = username
+            session['user_id'] = user_id
             self.username = username
-            self.user_id = user[0]
+            self.user_id = user_id
             self.last_login_at = datetime.datetime.now()
             self.failed_attempts = 0
 
@@ -68,6 +72,7 @@ class Auth:
         
     def logout(self):
         session.pop('username', None)
+        session.pop('user_id', None)
         self.username = None
         self.user_id = None
 
