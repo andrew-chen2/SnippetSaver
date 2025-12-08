@@ -70,29 +70,26 @@ def register():
 def logout():
     return auth.logout()
 
-@app.route('/new', methods=['GET', 'POST'])
+@app.route('/new', methods=['POST'])
 def new():
-    if request.method == 'GET':
-        return render_template('new.html')
-    elif request.method == 'POST':
-        title = request.form['title']
-        language = request.form['language']
-        code = request.form['code']
+    title = request.form['title']
+    language = request.form['language']
+    code = request.form['code']
 
-        if title.strip() == '':
-            return render_template('new.html', error='Title cannot be empty.')
-        if language.strip() == '':
-            return render_template('new.html', error='Language cannot be empty.')
-        if code.strip() == '':
-            return render_template('new.html', error='Code cannot be empty.')
-        
-        snippet = Snippet(get_db, title, code, language, auth.user_id)
-        snippet.save()
+    if title.strip() == '':
+        return render_template('new.html', error='Title cannot be empty.')
+    if language.strip() == '':
+        return render_template('new.html', error='Language cannot be empty.')
+    if code.strip() == '':
+        return render_template('new.html', error='Code cannot be empty.')
+    
+    snippet = Snippet(get_db, title, code, language, auth.user_id)
+    snippet.save()
 
-        return redirect(url_for('snippet', id = snippet.snippet_id))
+    return redirect(url_for('snippet', id = snippet.snippet_id))
 
-@app.route('/library')
-def library():
+@app.route('/snippets')
+def snippets():
     con = get_db()
     sql = "SELECT * FROM snippets WHERE user_id = ?"
     cur = con.execute(sql, (auth.user_id,))
@@ -109,8 +106,10 @@ def library():
         })
     return render_template('library.html', snippets = snippets_arr)
 
-@app.route('/snippets/<int:id>', methods=['GET'])
+@app.route('/snippets/<id>', methods=['GET'])
 def snippet(id):
+    if id == 'new':
+        return render_template('new.html')
     con = get_db()
     sql = "SELECT * FROM snippets WHERE id = ? AND user_id = ?"
     cur = con.execute(sql, (id, auth.user_id))

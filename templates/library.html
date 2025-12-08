@@ -18,7 +18,7 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2>My Snippets</h2>
-    <a href="/new" class="btn btn-primary">New Snippet</a>
+    <a href="/snippets/new" class="btn btn-primary">New Snippet</a>
 </div>
 
 <!-- Search and Sort Controls -->
@@ -52,7 +52,7 @@
 
                     <!-- Code Preview -->
                     <div class="border rounded">
-                        <textarea class="bg-light border rounded p-2 code" style="font-family: monospace; height: 150px; overflow: auto; resize: none" data-lang="{{ snippet.language }}" id="{{ snippet.id }}">{{ snippet.code }}</textarea>
+                        <textarea class="bg-light border rounded code" style="font-family: monospace; height: 150px; overflow: auto; resize: none" data-lang="{{ snippet.language }}" id="{{ snippet.id }}">{{ snippet.code }}</textarea>
                     </div>
 
                     <small class="text-muted">
@@ -61,8 +61,11 @@
                     </small>
 
                     <div class="d-flex justify-content-between mt-3">
-                        <a href="/snippets/{{ snippet.id }}" class="btn btn-primary btn-sm">View</a>
-                        <a href="/snippets/{{ snippet.id }}/edit" class="btn btn-secondary btn-sm">Edit</a>
+                        <div>
+                            <a href="/snippets/{{ snippet.id }}" class="btn btn-primary btn-sm">View</a>
+                            <a href="/snippets/{{ snippet.id }}/edit" class="btn btn-secondary btn-sm">Edit</a>
+                        </div>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="copy(this)" data-id="{{ snippet.id }}">Copy to Clipboard</button>
                     </div>
                 </div>
             </div>
@@ -95,8 +98,15 @@
             value: code.innerHTML,
             mode: langs[code.dataset.lang],
             readOnly: true,
+            theme: 'eclipse',
         });
         editor.setSize(null, 150);
+    }
+
+    function copy(btn) {
+        code = document.getElementById(btn.dataset.id);
+        code.select()
+        navigator.clipboard.writeText(code.value);
     }
 </script>
 
