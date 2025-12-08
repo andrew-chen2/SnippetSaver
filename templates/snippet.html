@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block title %}SnippetSaver - {{ snippet.title }}{% endblock %}
+
+{% block content %}
+<h1>{{ snippet.title }}</h1>
+<h3>{{ snippet.language }}</h3>
+<pre class="bg-light border rounded p-2" style="font-family: monospace; max-height: vh; overflow-y: auto;">{{ snippet.code }}</pre>
+{% endblock %}
