@@ -77,12 +77,6 @@ class Auth:
         self.user_id = None
 
         return redirect(url_for('index'))
-    
-    def get_user_id(self):
-        return self.user_id
-
-    def get_username(self):
-        return self.username
 
     @property
     def is_authenticated(self):
