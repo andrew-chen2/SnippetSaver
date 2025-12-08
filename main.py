@@ -1,8 +1,19 @@
-from flask import Flask, render_template, request, g, session
+from flask import Flask, render_template, request, g, session, redirect, url_for
 from sqlite3 import connect
 import os
 from auth import Auth
 from database import init_tables, delete_rows
+from snippets.snippetclass import Snippet
+
+LANGS = {
+    "python": 'Python',
+    "javascript": 'JavaScript',
+    "java": 'Java',
+    "cpp": 'C++',
+    "csharp": 'C#',
+    "html": 'HTML',
+    "other": 'Other',
+}
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -59,13 +70,62 @@ def register():
 def logout():
     return auth.logout()
 
-@app.route('/new')
+@app.route('/new', methods=['GET', 'POST'])
 def new():
-    return render_template('new.html')
+    if request.method == 'GET':
+        return render_template('new.html')
+    elif request.method == 'POST':
+        title = request.form['title']
+        language = request.form['language']
+        code = request.form['code']
+
+        if title.strip() == '':
+            return render_template('new.html', error='Title cannot be empty.')
+        if language.strip() == '':
+            return render_template('new.html', error='Language cannot be empty.')
+        if code.strip() == '':
+            return render_template('new.html', error='Code cannot be empty.')
+        
+        snippet = Snippet(get_db, title, code, language, auth.user_id)
+        snippet.save()
+
+        return redirect(url_for('snippet', id = snippet.snippet_id))
 
 @app.route('/library')
 def library():
-    return render_template('library.html')
+    con = get_db()
+    sql = "SELECT * FROM snippets WHERE user_id = ?"
+    cur = con.execute(sql, (auth.user_id,))
+    snippets = cur.fetchall()
+    snippets_arr = []
+    for snippet in snippets:
+        snippets_arr.append({
+            'id': snippet[0],
+            'title': snippet[2],
+            'code': snippet[3],
+            'language': LANGS[snippet[4]],
+            'created_at': snippet[6],
+            'modified_at': snippet[7],
+        })
+    return render_template('library.html', snippets = snippets_arr)
+
+@app.route('/snippets/<int:id>', methods=['GET'])
+def snippet(id):
+    con = get_db()
+    sql = "SELECT * FROM snippets WHERE id = ? AND user_id = ?"
+    cur = con.execute(sql, (id, auth.user_id))
+    snippet = cur.fetchone()
+    if snippet:
+        snippet_dict = {
+            'id': snippet[0],
+            'title': snippet[2],
+            'code': snippet[3],
+            'language': LANGS[snippet[4]],
+            'created_at': snippet[6],
+            'modified_at': snippet[7],
+        }
+        return render_template('snippet.html', snippet = snippet_dict)
+    return 'Not found'
 
 if __name__ == '__main__':
     app.run(debug=True)
