@@ -53,13 +53,14 @@
 
     <div class="d-flex justify-content-between mb-3">
         <div></div>
-        <button type="submit" class="btn btn-primary">Save Snippet</button>
+        <button type="submit" class="btn btn-primary" id="submit" disabled="true">Save Snippet</button>
     </div>
 </form>
 
 <script>
     const textarea = document.getElementById('code');
     const select = document.getElementById('language');
+    const submit = document.getElementById('submit');
     const langs = {
         python: "python",
         javascript: "javascript",
@@ -78,7 +79,7 @@
         placeholder: 'Paste or type your code snippet here...',
     });
 
-    select.addEventListener('change', async (e) => {
+    select.addEventListener('change', function (e) {
         editor.setOption('mode', langs[e.target.value]);
     });
 
@@ -87,6 +88,14 @@
         if (file) {
             const text = await file.text();
             editor.setValue(text);
+        }
+    });
+
+    editor.on('change', () => {
+        if (!editor.getValue().trim()){
+            submit.disabled = true;
+        } else {
+            submit.disabled = false;
         }
     });
 </script>
