@@ -51,7 +51,12 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h5 class="card-title mb-0" style="overflow: auto;">{{ snippet.title }}</h5>
-                        <span class="badge bg-info text-dark">{{ snippet.language }}</span>
+                        <div>
+                            {% if snippet.share_id %}
+                            <span class="badge bg-success">Shared</span>
+                            {% endif %}
+                            <span class="badge bg-info text-dark">{{ snippet.language }}</span>
+                        </div>
                     </div>
 
                     <!-- Code Preview -->
@@ -68,6 +73,7 @@
                         <div>
                             <a href="/snippets/{{ snippet.id }}" class="btn btn-primary btn-sm">View</a>
                             <a href="/snippets/{{ snippet.id }}/edit" class="btn btn-secondary btn-sm">Edit</a>
+                            <a href="/snippets/{{ snippet.id }}/delete" onclick="return confirm('Are you sure you want to delete this snippet?')" class="btn btn-danger btn-sm">Delete</a>
                         </div>
                         <button class="btn btn-outline-secondary btn-sm" onclick="copy(this)" data-id="{{ snippet.id }}">Copy to Clipboard</button>
                     </div>

@@ -19,6 +19,7 @@ class Snippet:
             self.title = snippet[2]
             self.code = snippet[3]
             self.language = snippet[4]
+            self.share_id = snippet[5]
         else:
             self.snippet_id = None
             self.title = title
@@ -72,7 +73,7 @@ class Snippet:
         con.commit()
         self.snippet_id = None
 
-    def generate_share_id(self):
+    def share(self):
         if self.share_id:
             return # Already has a share_id
 

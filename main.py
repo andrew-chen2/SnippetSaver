@@ -19,12 +19,21 @@ LANGS = {
 def get_snippet_dict(snippet):
     return {
         'id': snippet[0],
+        'user_id': snippet[1],
         'title': snippet[2],
         'code': snippet[3],
         'language': LANGS[snippet[4]],
+        'share_id': snippet[5],
         'created_at': snippet[6],
         'modified_at': snippet[7],
     }
+
+def get_snippet_from_id(id):
+    try:
+        snippet = Snippet(get_db, auth.user_id, snippet_id=id)
+        return snippet
+    except ValueError:
+        abort(404)
 
 def get_db():
     db = getattr(g, '_database', None)
@@ -97,7 +106,7 @@ def new():
     snippet = Snippet(get_db, auth.user_id, title, code, language)
     snippet.save()
 
-    return redirect(url_for('snippet', id = snippet.snippet_id))
+    return redirect(url_for('snippet', id=snippet.snippet_id))
 
 @app.route('/snippets')
 def snippets():
@@ -108,7 +117,7 @@ def snippets():
     snippets_arr = []
     for snippet in snippets:
         snippets_arr.append(get_snippet_dict(snippet))
-    return render_template('library.html', snippets = snippets_arr)
+    return render_template('library.html', snippets=snippets_arr)
 
 @app.route('/snippets/search')
 def search_snippets():
@@ -163,21 +172,17 @@ def edit(id):
         snippet = cur.fetchone()
         if snippet:
             snippet_dict = get_snippet_dict(snippet)
-            return render_template('edit.html', snippet = snippet_dict)
-        return 'Not found'
+            return render_template('edit.html', snippet=snippet_dict)
+        abort(404)
     elif request.method == 'POST':
         title = request.form['title']
         language = request.form['language']
         code = request.form['code']
 
-        try:
-            snippet = Snippet(get_db, auth.user_id, snippet_id=id)
-        except ValueError:
-            abort(404)
-
+        snippet = get_snippet_from_id(id)
         snippet.edit(title, code, language)
 
-        return redirect(url_for('snippet', id = id))
+        return redirect(url_for('snippet', id=id))
 
 @app.route('/snippets/<id>')
 def snippet(id):
@@ -189,18 +194,64 @@ def snippet(id):
     snippet = cur.fetchone()
     if snippet:
         snippet_dict = get_snippet_dict(snippet)
-        return render_template('snippet.html', snippet = snippet_dict)
-    return 'Not found'
+        return render_template('snippet.html', snippet=snippet_dict)
+    abort(404)
 
 @app.route('/snippets/<int:id>/delete')
+@auth.require_auth
 def delete_snippet(id):
-    try:
-        snippet = Snippet(get_db, auth.user_id, snippet_id=id)
-    except ValueError:
-        abort(404)
-        
+    snippet = get_snippet_from_id(id)
     snippet.delete()
     return redirect(url_for('snippets'))
+
+@app.route('/snippets/<int:id>/share')
+@auth.require_auth
+def share_snippet(id):
+    snippet = get_snippet_from_id(id)
+    snippet.share()
+    return redirect(url_for('shared', share_id=snippet.share_id))
+
+@app.route('/snippets/<int:id>/unshare')
+@auth.require_auth
+def unshare_snippet(id):
+    snippet = get_snippet_from_id(id)
+    snippet.unshare()
+    return redirect(url_for('snippet', id=id))
+
+@app.route('/shared/<string:share_id>')
+def shared(share_id):
+    con = get_db()
+    sql = "SELECT * FROM snippets WHERE share_id = ?"
+    cur = con.execute(sql, (share_id,))
+    snippet = cur.fetchone()
+    if snippet:
+        snippet_dict = get_snippet_dict(snippet)
+        # Get username of owner
+        sql = "SELECT username FROM users WHERE id = ?"
+        cur = con.execute(sql, (snippet[1],))
+        owner = cur.fetchone()
+        if owner:
+            snippet_dict['owner_username'] = owner[0]
+        else:
+            snippet_dict['owner_username'] = 'Deleted User'
+        own_snippet = snippet_dict['user_id'] == auth.user_id
+        return render_template('shared.html', snippet=snippet_dict, own_snippet=own_snippet)
+    abort(404)
+
+@app.route('/shared/<string:share_id>/add')
+@auth.require_auth
+def add_shared(share_id):
+    con = get_db()
+    sql = "SELECT * FROM snippets WHERE share_id = ?"
+    cur = con.execute(sql, (share_id,))
+    snippet = cur.fetchone()
+    if snippet:
+        if snippet[1] == auth.user_id:
+            return redirect(url_for('snippet', id=snippet[0]))
+        snippet = Snippet(get_db, auth.user_id, snippet[2], snippet[3], snippet[4])
+        snippet.save()
+        return redirect(url_for('snippet', id=snippet.snippet_id))
+    abort(404)
 
 if __name__ == '__main__':
     app.run(debug=True)
