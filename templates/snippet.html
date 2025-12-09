@@ -31,7 +31,7 @@
         {% if snippet.share_id %}
         <a href="/shared/{{ snippet.share_id }}" class="btn btn-primary">View Share Page</a>
         <a href="/snippets/{{ snippet.id }}/unshare" class="btn btn-danger">Unshare</a>
-        {% else %}
+        {% elif session.get('username') %}
         <a href="/snippets/{{ snippet.id }}/share" class="btn btn-primary">Share</a>
         {% endif %}
         <a href="/snippets/{{ snippet.id }}/edit" class="btn btn-secondary">Edit</a>
