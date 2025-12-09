@@ -44,6 +44,16 @@ class SnippetController:
             snippet_dict = self._get_snippet_dict(snippet)
             return snippet_dict
         return None
+    
+    def get_user_snippets(self, user_id):
+        con = self._get_db()
+        sql = "SELECT * FROM snippets WHERE user_id = ? ORDER BY modified_at DESC"
+        cur = con.execute(sql, (user_id,))
+        snippets = cur.fetchall()
+        snippets_arr = []
+        for snippet in snippets:
+            snippets_arr.append(self._get_snippet_dict(snippet))
+        return snippets_arr
 
     def create_snippet(self, user_id, title, code, language):
         if title.strip() == '':
