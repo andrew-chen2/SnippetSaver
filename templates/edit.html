@@ -47,7 +47,10 @@
     </div>
 
     <div class="d-flex justify-content-end mb-3">
-        <button type="submit" class="btn btn-primary" id="submit">Save Snippet</button>
+        <div>
+            <a href="/snippets/{{ snippet.id }}" class="btn btn-secondary" id="cancel">Cancel</a>
+            <button type="submit" class="btn btn-primary" id="submit">Save</button>
+        </div>
     </div>
 </form>
 
