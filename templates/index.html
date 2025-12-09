@@ -3,8 +3,8 @@
 {% block title %}SnippetSaver{% endblock %}
 
 {% block content %}
-    {% if session['username'] %}
-    <h2>Welcome, {{ session['username'] }}!</h2>
+    {% if username %}
+    <h2>Welcome, {{ username }}!</h2>
     {% else %}
     <h2>Welcome to SnippetSaver!</h2>
     {% endif %}
