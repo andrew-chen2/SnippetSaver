@@ -68,6 +68,12 @@ def new():
     language = request.form['language']
     code = request.form['code']
 
+    if title.strip() == '' or code.strip() == '' or not language:
+        abort(400, "Title, code, and language cannot be empty.")
+
+    if len(title) > 128 or len(code) > 4000:
+        abort(400, "Title or code exceeds maximum length.")
+
     return controller.create_snippet(auth.user_id, title, code, language)
 
 @app.route('/snippets')
@@ -94,6 +100,12 @@ def edit(id):
         title = request.form['title']
         language = request.form['language']
         code = request.form['code']
+
+        if title.strip() == '' or code.strip() == '' or not language:
+            abort(400, "Title, code, and language cannot be empty.")
+        
+        if len(title) > 128 or len(code) > 4000:
+            abort(400, "Title or code exceeds maximum length.")
 
         snippet = controller.get_snippet_from_id(id, auth.user_id)
         snippet.edit(title, code, language)
