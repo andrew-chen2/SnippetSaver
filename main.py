@@ -83,7 +83,7 @@ def new():
     if code.strip() == '':
         return render_template('new.html', error='Code cannot be empty.')
     
-    snippet = Snippet(get_db, title, code, language, auth.user_id)
+    snippet = Snippet(get_db, auth.user_id, title, code, language)
     snippet.save()
 
     return redirect(url_for('snippet', id = snippet.snippet_id))
@@ -106,7 +106,35 @@ def snippets():
         })
     return render_template('library.html', snippets = snippets_arr)
 
-@app.route('/snippets/<id>', methods=['GET'])
+@app.route('/snippets/<int:id>/edit', methods=['GET', 'POST'])
+def edit(id):
+    if request.method == 'GET':
+        con = get_db()
+        sql = "SELECT * FROM snippets WHERE id = ? AND user_id = ?"
+        cur = con.execute(sql, (id, auth.user_id))
+        snippet = cur.fetchone()
+        if snippet:
+            snippet_dict = {
+                'id': snippet[0],
+                'title': snippet[2],
+                'code': snippet[3],
+                'language': LANGS[snippet[4]],
+                'created_at': snippet[6],
+                'modified_at': snippet[7],
+            }
+            return render_template('edit.html', snippet = snippet_dict)
+        return 'Not found'
+    elif request.method == 'POST':
+        title = request.form['title']
+        language = request.form['language']
+        code = request.form['code']
+
+        snippet = Snippet(get_db, auth.user_id, snippet_id=id)
+        snippet.edit(title, code, language)
+
+        return redirect(url_for('snippet', id = id))
+
+@app.route('/snippets/<id>')
 def snippet(id):
     if id == 'new':
         return render_template('new.html')
