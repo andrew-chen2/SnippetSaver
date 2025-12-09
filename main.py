@@ -3,7 +3,7 @@ from sqlite3 import connect
 import os
 from auth import Auth
 from database import init_tables, delete_rows
-from snippets.snippetclass import Snippet
+from snippets.snippet import Snippet
 
 LANGS = {
     "python": 'Python',
