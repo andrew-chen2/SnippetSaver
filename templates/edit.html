@@ -58,6 +58,9 @@
     const textarea = document.getElementById('code');
     const select = document.getElementById('language');
     const submit = document.getElementById('submit');
+    const title = document.getElementById('title');
+    const titleLabel = document.querySelector('label[for="title"]');
+    const codeLabel = document.querySelector('label[for="code"]');
     const modes = {
         python: "python",
         javascript: "javascript",
@@ -95,12 +98,26 @@
     });
 
     editor.on('change', () => {
-        if (!editor.getValue().trim()){
-            submit.disabled = true;
-        } else {
-            submit.disabled = false;
+        submit.disabled = !editor.getValue().length;
+
+        const remaining = 4000 - editor.getValue().length;
+        codeLabel.textContent = `Code (${remaining} characters left)`;
+    });
+
+    editor.on('beforeChange', (instance, change) => {
+        const newLength = instance.getValue().length + change.text.join('\n').length - (change.to.ch - change.from.ch);
+        if (newLength > 4000) {
+            change.cancel();
         }
     });
+
+    title.addEventListener('input', (e) => {
+        const remaining = 128 - e.target.value.length;
+        titleLabel.textContent = `Title (${remaining} characters left)`;
+    });
+
+    codeLabel.textContent = `Code (${4000 - editor.getValue().length} characters left)`;
+    titleLabel.textContent = `Title (${128 - title.value.length} characters left)`;
 
 </script>
 {% endblock %}

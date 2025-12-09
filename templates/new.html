@@ -21,8 +21,8 @@
 <form action="/new" method="post" enctype="multipart/form-data">
     <div class="d-flex mb-3 gap-3">
         <div class="flex-fill">
-            <label for="title" class="form-label">Title</label>
-            <input type="text" class="form-control" id="title" name="title" placeholder="Enter a title for your snippet" required>
+            <label for="title" class="form-label">Title (128 left)</label>
+            <input type="text" class="form-control" id="title" name="title" placeholder="Enter a title for your snippet" maxlength="128" required>
         </div>
         <div>
             <label for="language" class="form-label">Language</label>
@@ -40,7 +40,7 @@
     </div>
 
     <div class="mb-3">
-        <label for="code" class="form-label">Code</label>
+        <label for="code" class="form-label">Code (4000 characters left)</label>
         <div class="border rounded">
             <textarea class="form-control bg-light" id="code" name="code"></textarea>
         </div>
@@ -60,6 +60,9 @@
     const textarea = document.getElementById('code');
     const select = document.getElementById('language');
     const submit = document.getElementById('submit');
+    const title = document.getElementById('title');
+    const titleLabel = document.querySelector('label[for="title"]');
+    const codeLabel = document.querySelector('label[for="code"]');
     const modes = {
         python: "python",
         javascript: "javascript",
@@ -91,11 +94,22 @@
     });
 
     editor.on('change', () => {
-        if (!editor.getValue().trim()){
-            submit.disabled = true;
-        } else {
-            submit.disabled = false;
+        submit.disabled = !editor.getValue().length;
+
+        const remaining = 4000 - editor.getValue().length;
+        codeLabel.textContent = `Code (${remaining} characters left)`;
+    });
+
+    editor.on('beforeChange', (instance, change) => {
+        const newLength = instance.getValue().length + change.text.join('\n').length - (change.to.ch - change.from.ch);
+        if (newLength > 4000) {
+            change.cancel();
         }
+    });
+
+    title.addEventListener('input', (e) => {
+        const remaining = 128 - e.target.value.length;
+        titleLabel.textContent = `Title (${remaining} characters left)`;
     });
 </script>
 {% endblock %}
