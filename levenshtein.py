@@ -25,14 +25,22 @@ def levenshtein_dist(str1: str, str2: str) -> int:
                 )
     return dp[m][n]
 
-def fuzzy_search(haystack: str, needle: str, max_dist: int) -> bool:
+def fuzzy_search(haystack: str, needle: str) -> bool:
+    THRESHOLD = 0.25
     haystack_len = len(haystack)
     needle_len = len(needle)
+
+    if needle in haystack:
+        return True
+
+    # Only do fuzzy search for needles longer than 3 characters
+    if needle_len < 4:
+        return needle in haystack
     
     for i in range(haystack_len - needle_len + 1):
         sub_str = haystack[i:i+needle_len]
 
-        if levenshtein_dist(sub_str, needle) <= max_dist:
+        if levenshtein_dist(sub_str, needle) / len(needle) <= THRESHOLD:
             return True
         
     return False
