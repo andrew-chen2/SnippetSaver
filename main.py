@@ -15,6 +15,16 @@ LANGS = {
     "other": 'Other',
 }
 
+def get_snippet_dict(snippet):
+    return {
+        'id': snippet[0],
+        'title': snippet[2],
+        'code': snippet[3],
+        'language': LANGS[snippet[4]],
+        'created_at': snippet[6],
+        'modified_at': snippet[7],
+    }
+
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
@@ -96,14 +106,7 @@ def snippets():
     snippets = cur.fetchall()
     snippets_arr = []
     for snippet in snippets:
-        snippets_arr.append({
-            'id': snippet[0],
-            'title': snippet[2],
-            'code': snippet[3],
-            'language': LANGS[snippet[4]],
-            'created_at': snippet[6],
-            'modified_at': snippet[7],
-        })
+        snippets_arr.append(get_snippet_dict(snippet))
     return render_template('library.html', snippets = snippets_arr)
 
 @app.route('/snippets/<int:id>/edit', methods=['GET', 'POST'])
@@ -114,14 +117,7 @@ def edit(id):
         cur = con.execute(sql, (id, auth.user_id))
         snippet = cur.fetchone()
         if snippet:
-            snippet_dict = {
-                'id': snippet[0],
-                'title': snippet[2],
-                'code': snippet[3],
-                'language': LANGS[snippet[4]],
-                'created_at': snippet[6],
-                'modified_at': snippet[7],
-            }
+            snippet_dict = get_snippet_dict(snippet)
             return render_template('edit.html', snippet = snippet_dict)
         return 'Not found'
     elif request.method == 'POST':
@@ -143,14 +139,7 @@ def snippet(id):
     cur = con.execute(sql, (id, auth.user_id))
     snippet = cur.fetchone()
     if snippet:
-        snippet_dict = {
-            'id': snippet[0],
-            'title': snippet[2],
-            'code': snippet[3],
-            'language': LANGS[snippet[4]],
-            'created_at': snippet[6],
-            'modified_at': snippet[7],
-        }
+        snippet_dict = get_snippet_dict(snippet)
         return render_template('snippet.html', snippet = snippet_dict)
     return 'Not found'
 
