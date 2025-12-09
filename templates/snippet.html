@@ -38,10 +38,14 @@
     <textarea class="bg-light" id="code" name="code">{{ snippet.code }}</textarea>
 </div>
 
-<small class="text-muted">
-    Created: {{ snippet.created_at }} | 
-    Modified: {{ snippet.modified_at }}
-</small>
+<div class="d-flex justify-content-between">
+    <small class="text-muted">
+        Created: {{ snippet.created_at }} |
+        Modified: {{ snippet.modified_at }}
+    </small>
+
+    <a href="/snippets/{{ snippet.id }}/delete" onclick="return confirm('Are you sure you want to delete this snippet?')" class="btn btn-danger mt-3">Delete</a>
+</div>
 
 <script>
     const textarea = document.getElementById('code');

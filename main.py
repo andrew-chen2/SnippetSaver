@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, g, session, redirect, url_for
+from flask import Flask, render_template, request, g, session, redirect, url_for, abort
 from sqlite3 import connect
 import os
 from auth import Auth
@@ -129,7 +129,7 @@ def search_snippets():
             snippets_arr.sort(key=lambda x: x['title'].lower())
         case 'language':
             snippets_arr.sort(key=lambda x: x['language'].lower())
-            
+
     return render_template('library.html', snippets = snippets_arr)
 
 @app.route('/snippets/<int:id>/edit', methods=['GET', 'POST'])
@@ -165,6 +165,12 @@ def snippet(id):
         snippet_dict = get_snippet_dict(snippet)
         return render_template('snippet.html', snippet = snippet_dict)
     return 'Not found'
+
+@app.route('/snippets/<int:id>/delete')
+def delete_snippet(id):
+    snippet = Snippet(get_db, auth.user_id, snippet_id=id)
+    snippet.delete()
+    return redirect(url_for('snippets'))
 
 if __name__ == '__main__':
     app.run(debug=True)
