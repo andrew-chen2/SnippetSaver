@@ -18,7 +18,7 @@
                 <li class="nav-item" style="border-right: 1px solid black;">
                     <a href="/snippets/new" class="nav-link">New Snippet</a>
                 </li>
-                {% if session['username'] %}
+                {% if session.get('username') %}
                 <li class="nav-item">
                     <form action="/logout" method="post">
                         <button type="submit" class="nav-link">Logout</button>
