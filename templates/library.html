@@ -24,7 +24,7 @@
 <!-- Search and Sort Controls -->
 <form class="d-flex gap-3 mb-3" method="get" action="/snippets/search">
     <div class="flex-fill">
-        <input type="text" name="q" class="form-control" placeholder="Search snippets..." value="{{ request.args.get('q', '') }}">
+        <input type="search" name="q" class="form-control" placeholder="Search snippets..." value="{{ request.args.get('q', '') }}">
     </div>
     <div>
         <select name="sort" class="form-select">
