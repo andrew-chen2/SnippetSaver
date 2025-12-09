@@ -63,6 +63,7 @@ def logout():
     return auth.logout()
 
 @app.route('/new', methods=['POST'])
+@auth.require_auth
 def new():
     title = request.form['title']
     language = request.form['language']
@@ -77,10 +78,12 @@ def new():
     return controller.create_snippet(auth.user_id, title, code, language)
 
 @app.route('/snippets')
+@auth.require_auth
 def snippets():
     return controller.search_snippets(auth.user_id, '', 'recent', False, False)
 
 @app.route('/snippets/search')
+@auth.require_auth
 def search_snippets():
     query = request.args.get('q', '').strip().lower()
     sort = request.args.get('sort', 'recent')
@@ -90,6 +93,7 @@ def search_snippets():
     return controller.search_snippets(auth.user_id, query, sort, include_code, fuzzy)
 
 @app.route('/snippets/<int:id>/edit', methods=['GET', 'POST'])
+@auth.require_auth
 def edit(id):
     if request.method == 'GET':
         snippet = controller.get_snippet(id, auth.user_id)
@@ -113,6 +117,7 @@ def edit(id):
         return redirect(url_for('snippet', id=id))
 
 @app.route('/snippets/<id>')
+@auth.require_auth
 def snippet(id):
     if id == 'new':
         return render_template('new.html')
