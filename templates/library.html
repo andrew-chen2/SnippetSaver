@@ -79,7 +79,7 @@
 {% endif %}
 
 <script>
-    const langs = {
+    const modes = {
         Python: "python",
         JavaScript: "javascript",
         Java: "text/x-java",
@@ -96,7 +96,7 @@
         let editor = CodeMirror.fromTextArea(code, {
             lineNumbers: true,
             value: code.innerHTML,
-            mode: langs[code.dataset.lang],
+            mode: modes[code.dataset.lang],
             readOnly: true,
             theme: 'eclipse',
         });

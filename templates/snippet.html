@@ -46,7 +46,7 @@
 <script>
     const textarea = document.getElementById('code');
     const language = document.getElementById('language');
-    const langs = {
+    const modes = {
         Python: "python",
         JavaScript: "javascript",
         Java: "text/x-java",
@@ -61,7 +61,7 @@
         lineNumbers: true,
         mode: null,
         theme: 'eclipse',
-        mode: langs[language.dataset.lang],
+        mode: modes[language.dataset.lang],
         readOnly: true,
     });
     editor.setSize(null, 'auto');

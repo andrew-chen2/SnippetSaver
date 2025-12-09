@@ -61,7 +61,7 @@
     const textarea = document.getElementById('code');
     const select = document.getElementById('language');
     const submit = document.getElementById('submit');
-    const langs = {
+    const modes = {
         python: "python",
         javascript: "javascript",
         java: "text/x-java",
@@ -80,7 +80,7 @@
     });
 
     select.addEventListener('change', function (e) {
-        editor.setOption('mode', langs[e.target.value]);
+        editor.setOption('mode', modes[e.target.value]);
     });
 
     document.getElementById('fileUpload').addEventListener('change', async (e) => {
