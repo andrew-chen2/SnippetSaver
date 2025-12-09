@@ -25,6 +25,10 @@
 <form class="d-flex gap-3 mb-3" method="get" action="/snippets/search">
     <div class="flex-fill">
         <input type="search" name="q" class="form-control" placeholder="Search snippets..." value="{{ request.args.get('q', '') }}">
+        <input type="checkbox" name="include_code" id="include_code" {% if request.args.get('include_code') %}checked{% endif %}>
+        <label for="include_code">Include code in search</label>
+        <input type="checkbox" name="fuzzy" id="fuzzy" {% if request.args.get('fuzzy') %}checked{% endif %}>
+        <label for="fuzzy">Fuzzy search</label>
     </div>
     <div>
         <select name="sort" class="form-select">

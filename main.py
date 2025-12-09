@@ -4,6 +4,7 @@ import os
 from auth import Auth
 from database import init_tables, delete_rows
 from snippets.snippet import Snippet
+from levenshtein import fuzzy_search
 
 LANGS = {
     "python": 'Python',
@@ -112,12 +113,33 @@ def snippets():
 @app.route('/snippets/search')
 def search_snippets():
     con = get_db()
-    query = request.args.get('q', '').strip()
+    query = request.args.get('q', '').strip().lower()
     sort = request.args.get('sort', 'recent')
+    include_code = request.args.get('include_code')
+    fuzzy = request.args.get('fuzzy')
 
-    sql = "SELECT * FROM snippets WHERE user_id = ? AND title LIKE ?"
-    cur = con.execute(sql, (auth.user_id, f'%{query}%'))
-    snippets = cur.fetchall()
+    if fuzzy:
+        sql = "SELECT * FROM snippets WHERE user_id = ?"
+        cur = con.execute(sql, (auth.user_id,))
+        snippets = cur.fetchall()
+        
+        filtered_snippets = []
+        
+        for snippet in snippets:
+            if fuzzy_search(snippet[2].lower(), query) or (include_code and fuzzy_search(snippet[3].lower(), query)):
+                filtered_snippets.append(snippet)
+
+        snippets = filtered_snippets
+    else:
+        if include_code:
+            sql = "SELECT * FROM snippets WHERE user_id = ? AND (title LIKE ? OR code LIKE ?)"
+            cur = con.execute(sql, (auth.user_id, f'%{query}%', f'%{query}%'))
+        else:
+            sql = "SELECT * FROM snippets WHERE user_id = ? AND title LIKE ?"
+            cur = con.execute(sql, (auth.user_id, f'%{query}%'))
+
+        snippets = cur.fetchall()
+
     snippets_arr = []
     for snippet in snippets:
         snippets_arr.append(get_snippet_dict(snippet))
