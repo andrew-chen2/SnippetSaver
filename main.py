@@ -148,7 +148,11 @@ def edit(id):
         language = request.form['language']
         code = request.form['code']
 
-        snippet = Snippet(get_db, auth.user_id, snippet_id=id)
+        try:
+            snippet = Snippet(get_db, auth.user_id, snippet_id=id)
+        except ValueError:
+            abort(404)
+
         snippet.edit(title, code, language)
 
         return redirect(url_for('snippet', id = id))
@@ -168,7 +172,11 @@ def snippet(id):
 
 @app.route('/snippets/<int:id>/delete')
 def delete_snippet(id):
-    snippet = Snippet(get_db, auth.user_id, snippet_id=id)
+    try:
+        snippet = Snippet(get_db, auth.user_id, snippet_id=id)
+    except ValueError:
+        abort(404)
+        
     snippet.delete()
     return redirect(url_for('snippets'))
 
