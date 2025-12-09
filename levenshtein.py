@@ -26,7 +26,7 @@ def levenshtein_dist(str1: str, str2: str) -> int:
     return dp[m][n]
 
 def fuzzy_search(haystack: str, needle: str) -> bool:
-    THRESHOLD = 0.25
+    THRESHOLD = 0.3
     haystack_len = len(haystack)
     needle_len = len(needle)
 
