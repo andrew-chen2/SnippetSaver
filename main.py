@@ -109,6 +109,29 @@ def snippets():
         snippets_arr.append(get_snippet_dict(snippet))
     return render_template('library.html', snippets = snippets_arr)
 
+@app.route('/snippets/search')
+def search_snippets():
+    con = get_db()
+    query = request.args.get('q', '').strip()
+    sort = request.args.get('sort', 'recent')
+
+    sql = "SELECT * FROM snippets WHERE user_id = ? AND title LIKE ?"
+    cur = con.execute(sql, (auth.user_id, f'%{query}%'))
+    snippets = cur.fetchall()
+    snippets_arr = []
+    for snippet in snippets:
+        snippets_arr.append(get_snippet_dict(snippet))
+    
+    match sort:
+        case 'recent':
+            snippets_arr.sort(key=lambda x: x['modified_at'] or x['created_at'], reverse=True)
+        case 'title':
+            snippets_arr.sort(key=lambda x: x['title'].lower())
+        case 'language':
+            snippets_arr.sort(key=lambda x: x['language'].lower())
+            
+    return render_template('library.html', snippets = snippets_arr)
+
 @app.route('/snippets/<int:id>/edit', methods=['GET', 'POST'])
 def edit(id):
     if request.method == 'GET':
