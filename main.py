@@ -3,7 +3,7 @@ from sqlite3 import connect
 import os
 from auth import Auth
 from database import init_tables, delete_rows
-from snippets.snippet import Snippet
+from snippet import Snippet
 from levenshtein import fuzzy_search
 
 LANGS = {
