@@ -1,4 +1,4 @@
-from flask import session, redirect, url_for, render_template, flash
+from flask import session, redirect, url_for, flash
 from re import match
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
