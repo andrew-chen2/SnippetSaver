@@ -27,19 +27,8 @@ def init_tables():
         'FOREIGN KEY(user_id)': ['REFERENCES users(id)']
     }
 
-    temp_columns = {
-        'id': ['INTEGER', 'PRIMARY KEY', 'AUTOINCREMENT'],
-        'temp_id': ['TEXT', 'NOT NULL'],
-        'title': ['TEXT', 'NOT NULL'],
-        'code': ['TEXT', 'NOT NULL'],
-        'language': ['TEXT'],
-        'created_at': ['TIMESTAMP', 'DEFAULT CURRENT_TIMESTAMP'],
-        'modified_at': ['TIMESTAMP', 'DEFAULT CURRENT_TIMESTAMP'],
-    }
-
     create_table('users', user_columns)
     create_table('snippets', snippet_columns)
-    create_table('temp_snippets', temp_columns)
 
 def delete_rows(tables: list):
     if not tables:
