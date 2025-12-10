@@ -1,15 +1,10 @@
 from flask import session, redirect, url_for, flash
 from re import match
 from werkzeug.security import generate_password_hash, check_password_hash
-import datetime
 
 class Auth:
     def __init__(self, get_db):
         self.get_db = get_db
-        self.username = None
-        self.user_id = None
-        self.failed_attempts = 0
-        self.last_login_at = None
 
     def register(self, username: str, password: str):
         con = self.get_db()
@@ -50,9 +45,6 @@ class Auth:
         
         session['username'] = username
         session['user_id'] = user_id
-        self.username = username
-        self.user_id = user_id
-        self.last_login_at = datetime.datetime.now()
 
         return redirect(url_for('index'))
 
@@ -66,29 +58,25 @@ class Auth:
             user_id = user[0]
             session['username'] = username
             session['user_id'] = user_id
-            self.username = username
-            self.user_id = user_id
-            self.last_login_at = datetime.datetime.now()
-            self.failed_attempts = 0
 
             return redirect(url_for('index'))
         else:
-            self.failed_attempts += 1
-            
             flash('Invalid username or password.', 'error')
             return redirect(url_for('login'))
         
     def logout(self):
         session.pop('username', None)
         session.pop('user_id', None)
-        self.username = None
-        self.user_id = None
 
         return redirect(url_for('index'))
 
     @property
     def is_authenticated(self):
         return 'username' in session
+    
+    @property
+    def user_id(self):
+        return session.get('user_id')
 
     def require_auth(self, func):
         def wrapper(*args, **kwargs):
