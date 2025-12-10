@@ -3,7 +3,6 @@ from sqlite3 import connect
 import os
 from auth import Auth
 from database import init_tables, delete_rows
-from snippet import Snippet
 from snippet_controller import SnippetController
 
 DEMO_SNIPPETS = [
