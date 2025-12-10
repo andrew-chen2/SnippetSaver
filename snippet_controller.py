@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, abort
+from flask import render_template, redirect, url_for, abort, flash
 from snippet import Snippet
 from levenshtein import fuzzy_search
 
@@ -27,6 +27,23 @@ class SnippetController:
             'created_at': snippet[6],
             'modified_at': snippet[7],
         }
+    
+    def validate_snippet(self, title, code, language):
+        if len(title) > 128 or len(code) > 4000:
+            flash('Title or code exceeds maximum length.', 'error')
+            return redirect(url_for('snippet', id='new'))
+        if title.strip() == '':
+            flash('Title cannot be empty.', 'error')
+            return redirect(url_for('snippet', id='new'))
+        if language.strip() == '':
+            flash('Language cannot be empty.', 'error')
+            return redirect(url_for('snippet', id='new'))
+        if code.strip() == '':
+            flash('Code cannot be empty.', 'error')
+            return redirect(url_for('snippet', id='new'))
+        if language not in self._LANGS:
+            flash('Invalid language selected.', 'error')
+            return redirect(url_for('snippet', id='new'))  
 
     def get_snippet_from_id(self, id, user_id):
         try:
@@ -56,12 +73,9 @@ class SnippetController:
         return snippets_arr
 
     def create_snippet(self, user_id, title, code, language):
-        if title.strip() == '':
-            return render_template('new.html', error='Title cannot be empty.')
-        if language.strip() == '':
-            return render_template('new.html', error='Language cannot be empty.')
-        if code.strip() == '':
-            return render_template('new.html', error='Code cannot be empty.')
+        validated = self.validate_snippet(title, code, language)
+        if validated:
+            return validated
         
         snippet = Snippet(self._get_db, user_id, title, code, language)
         snippet.save()

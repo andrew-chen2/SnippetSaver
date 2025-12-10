@@ -46,6 +46,14 @@
         </div>
     </div>
 
+    {% with errors = get_flashed_messages(category_filter=["error"]) %}
+    {% if errors %}
+    <p style="color: red;">
+    {{ errors[0] }}
+    </p>
+    {% endif %}
+    {% endwith %}
+
     <div class="d-flex justify-content-end mb-3">
         <div>
             <a href="/snippets/{{ snippet.id }}" class="btn btn-secondary" id="cancel">Cancel</a>

@@ -51,6 +51,14 @@
         <input class="form-control" type="file" id="fileUpload" name="file" accept=".py,.js,.java,.cpp,.cs,.html,.txt">
     </div>
 
+    {% with errors = get_flashed_messages(category_filter=["error"]) %}
+    {% if errors %}
+    <p style="color: red;">
+    {{ errors[0] }}
+    </p>
+    {% endif %}
+    {% endwith %}
+
     <div class="d-flex justify-content-end mb-3">
         <button type="submit" class="btn btn-primary" id="submit" disabled="true">Save Snippet</button>
     </div>
