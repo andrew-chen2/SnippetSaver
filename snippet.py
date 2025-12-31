@@ -1,6 +1,5 @@
 import datetime
 import uuid
-from snippets.detectors.detector import detect_snippets
 
 class Snippet:
     def __init__(self, get_db, user_id, title = None, code = None, language = None, snippet_id = None):
