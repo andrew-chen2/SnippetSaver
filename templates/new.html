@@ -63,6 +63,24 @@
     </div>
 </form>
 
+<div id="modal" class="d-none position-fixed z-1 start-0 top-0 w-100 h-100 overflow-auto" style="background-color: rgba(0, 0, 0, 0.4);" tabindex="-1">
+    <!-- popup for selecting detected snippets from uploaded file -->
+    <div id="modal-content" class="bg-light p-4 m-5 border rounded w-75 mx-auto">
+        <div class="d-flex flex-row justify-content-between align-items-center mb-3">
+            <h3 class="modal-title">Select Snippet</h3>
+            <button type="button" class="btn-close" id="close"></button>
+        </div>
+        <div class="d-flex flex-row align-items-center gap-2">
+            <button id="select-whole-file" class="btn btn-primary">Select whole file</button>
+            <p style="color: red; display: none; margin-bottom: 0;" id="modal-error">Uploaded code too long to select whole file.</p>
+        </div>
+        <p>or</p>
+        <div class="modal-body">
+            <h5>Select a snippet from the uploaded file:</h5>
+            <div id="snippet-options" class="row row-cols-1 row-cols-md-2"></div>
+    </div>
+</div>
+
 <script>
     const textarea = document.getElementById('code');
     const select = document.getElementById('language');
@@ -70,6 +88,7 @@
     const title = document.getElementById('title');
     const titleLabel = document.querySelector('label[for="title"]');
     const codeLabel = document.querySelector('label[for="code"]');
+    const fileInput = document.getElementById('fileUpload');
     const modes = {
         python: "python",
         javascript: "javascript",
@@ -80,6 +99,22 @@
         other: null,
         "": null
     };
+    const fileTypes = {
+        "python": "py", 
+        "javascript": "js",
+        "java": "java",
+        "cpp": "cpp",
+        "csharp": "cs",
+        "html": "html"
+    };
+
+    // Modal
+    const modal = document.getElementById('modal');
+    const closeModalBtn = document.getElementById('close');
+    const snippetOptions = document.getElementById('snippet-options');
+    const selectWholeFile = document.getElementById('select-whole-file');
+    const modalError = document.getElementById('modal-error');
+    let language = '';
 
     let editor = CodeMirror.fromTextArea(textarea, {
         lineNumbers: true,
@@ -95,7 +130,72 @@
         const file = e.target.files[0];
         if (file) {
             const text = await file.text();
-            editor.setValue(text);
+            const extension = file.name.split('.').at(-1); 
+            language = Object.keys(fileTypes).find(key => fileTypes[key] === extension) || 'other';
+            
+            if (text.length > 4000) {
+                selectWholeFile.disabled = true;
+                modalError.style.display = 'block';
+            } else {
+                selectWholeFile.disabled = false;
+                modalError.style.display = 'none';
+            }
+            snippetOptions.innerHTML = '';
+
+            fetch('/api/get_snippets_from_code', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({code: text, language: language})
+            }).then(response => response.json())
+            .then(data => {
+                if (data.length === 0) {
+                    snippetOptions.innerHTML = '<p>No snippets detected in the uploaded file.</p>';
+                    return;
+                }
+
+                data.forEach((snippet, index) => {
+                    const col = document.createElement('div');
+                    col.className = 'col mb-3';
+                    
+                    const card = document.createElement('div');
+                    card.className = 'card';
+
+                    const body = document.createElement('div');
+                    body.className = 'card-body';
+
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'border rounded';
+
+                    const textarea = document.createElement('textarea');
+                    textarea.className = 'bg-light border rounded code';
+                    textarea.style.cssText = 'font-family: monospace; height: 150px; overflow: auto; resize: none';
+                    textarea.id = `snippet-${index}`;
+                    textarea.value = snippet;
+
+                    const selectBtn = document.createElement('div');
+                    selectBtn.className = 'd-flex justify-content-end mt-3';
+                    selectBtn.innerHTML = `<button class="btn btn-primary select-snippet" data-id="snippet-${index}">Select this snippet</button>`;
+
+                    wrapper.appendChild(textarea);
+                    body.appendChild(wrapper);
+                    body.appendChild(selectBtn);
+                    card.appendChild(body);
+                    col.appendChild(card);
+
+                    snippetOptions.appendChild(col);
+                    let editor = CodeMirror.fromTextArea(document.getElementById(`snippet-${index}`), {
+                        lineNumbers: true,
+                        value: snippet,
+                        mode: modes[language],
+                        readOnly: true
+                    });
+                    editor.setSize(null, 150);
+                });
+            });
+
+            modal.classList.remove('d-none');
         }
     });
 
@@ -116,6 +216,44 @@
     title.addEventListener('input', (e) => {
         const remaining = 128 - e.target.value.length;
         titleLabel.textContent = `Title (${remaining} characters left)`;
+    });
+
+    function closeModal() {
+        modal.classList.add('d-none');
+        fileInput.value = null;
+    }
+
+    closeModalBtn.addEventListener('click', () => {
+        closeModal();
+    });
+
+    window.addEventListener('click', (event) => {
+        if (event.target == modal) {
+            closeModal();
+        }
+    });
+
+    snippetOptions.addEventListener('click', (e) => {
+        if (e.target.classList.contains('select-snippet')) {
+            const snippetId = e.target.getAttribute('data-id');
+            const snippetTextarea = document.getElementById(snippetId);
+            editor.setValue(snippetTextarea.value);
+            select.value = language;
+            editor.setOption('mode', modes[language]);
+            closeModal();
+        }
+    });
+
+    selectWholeFile.addEventListener('click', () => {
+        const file = fileInput.files[0];
+        if (file) {
+            file.text().then(text => {
+                editor.setValue(text);
+                select.value = language;
+                editor.setOption('mode', modes[language]);
+                closeModal();
+            });
+        }
     });
 </script>
 {% endblock %}
