@@ -155,5 +155,14 @@ def shared(share_id):
 def add_shared(share_id):
     return controller.add_shared_snippet(share_id, auth.user_id)
 
+@app.route('/api/get_snippets_from_code', methods=['POST'])
+@auth.require_auth
+def get_snippets_from_code():
+    code = request.json.get('code', '')
+    lang = request.json.get('language', '')
+    snippets = controller.get_detected_snippets(code, lang)
+    
+    return snippets
+
 if __name__ == '__main__':
     app.run(debug=True)
