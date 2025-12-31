@@ -39,7 +39,7 @@
     </div>
 
     <div class="mb-3">
-        <label for="code" class="form-label">Code (4000 characters left)</label>
+        <label for="code" class="form-label">Code (10000 characters left)</label>
         <div class="border rounded">
             <textarea class="form-control bg-light" id="code" name="code"></textarea>
         </div>
@@ -135,7 +135,7 @@
             const extension = file.name.split('.').at(-1); 
             language = Object.keys(fileTypes).find(key => fileTypes[key] === extension) || 'other';
             
-            if (text.length > 4000) {
+            if (text.length > 10000) {
                 selectWholeFile.disabled = true;
                 modalError.style.display = 'block';
             } else {
@@ -204,13 +204,13 @@
     editor.on('change', () => {
         submit.disabled = !editor.getValue().length;
 
-        const remaining = 4000 - editor.getValue().length;
+        const remaining = 10000 - editor.getValue().length;
         codeLabel.textContent = `Code (${remaining} characters left)`;
     });
 
     editor.on('beforeChange', (instance, change) => {
         const newLength = instance.getValue().length + change.text.join('\n').length - (change.to.ch - change.from.ch);
-        if (newLength > 4000) {
+        if (newLength > 10000) {
             change.cancel();
             codeTooLong.style.display = 'block';
         } else {

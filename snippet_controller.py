@@ -34,7 +34,7 @@ class SnippetController:
         }
     
     def validate_snippet(self, title, code, language, url):
-        if len(title) > 128 or len(code) > 4000:
+        if len(title) > 128 or len(code) > 10000:
             flash('Title or code exceeds maximum length.', 'error')
             return redirect(url)
         if title.strip() == '':

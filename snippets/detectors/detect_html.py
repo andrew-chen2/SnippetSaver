@@ -20,7 +20,7 @@ def detect_html_snippets(code: str) -> list:
                         depth += 1
                     if depth == 0:
                         snippet = code[stack[start][1]:stack[i][2]]
-                        if len(snippet.strip()) > 4000 or snippet.count('\n') < 1:
+                        if len(snippet.strip()) > 10000 or snippet.count('\n') < 1:
                             break
                         snippets.append(snippet)
                         start = i
