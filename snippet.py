@@ -28,8 +28,6 @@ class Snippet:
             self.share_id = None
 
     def save(self):
-        con = self._get_db()
-
         # Already saved
         if self.snippet_id:
             return
@@ -41,6 +39,8 @@ class Snippet:
             raise ValueError("Code cannot be empty.")
         if not self.language:
             raise ValueError("Langage cannot be empty.")
+        
+        con = self._get_db()
 
         # Store in database
         current_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -49,7 +49,7 @@ class Snippet:
         con.commit()
         self.snippet_id = con.execute("SELECT last_insert_rowid()").fetchone()[0]
 
-    def edit(self, new_title: str = None, new_code: str = None, new_language: str = None):
+    def edit(self, new_title: str, new_code: str, new_language: str):
         con = self._get_db()
 
         # Validation
@@ -58,7 +58,7 @@ class Snippet:
         if new_code.strip() == '':
             raise ValueError("Code cannot be empty.")
         if not new_language:
-            raise ValueError("Langage cannot be empty.")
+            raise ValueError("Language cannot be empty.")
 
         # Update in database
         current_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
