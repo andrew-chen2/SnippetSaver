@@ -105,7 +105,7 @@ def edit(id):
         language = request.form['language']
         code = request.form['code']
 
-        validated = controller.validate_snippet(title, code, language)
+        validated = controller.validate_snippet(title, code, language, url_for('edit', id=id))
         if validated:
             return validated
 
@@ -154,6 +154,23 @@ def shared(share_id):
 @auth.require_auth
 def add_shared(share_id):
     return controller.add_shared_snippet(share_id, auth.user_id)
+
+@app.route('/test')
+def test():
+    snippet = {
+        'id': 2,
+        'user_id': 0,
+        'title': 'FizzBuzz in JavaScript',
+        'code': '''for (let i = 1; i <= 100; i++) {
+    let output = '';
+    if (i % 3 === 0) output += 'Fizz';
+    if (i % 5 === 0) output += 'Buzz';
+    console.log(output || i);
+}''',
+'owner_username': 'DemoUser',
+'language': 'JavaScript'
+    }
+    return render_template('_.html', snippet=snippet)
 
 if __name__ == '__main__':
     app.run(debug=True)

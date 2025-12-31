@@ -28,22 +28,22 @@ class SnippetController:
             'modified_at': snippet[7],
         }
     
-    def validate_snippet(self, title, code, language):
+    def validate_snippet(self, title, code, language, url):
         if len(title) > 128 or len(code) > 4000:
             flash('Title or code exceeds maximum length.', 'error')
-            return redirect(url_for('snippet', id='new'))
+            return redirect(url)
         if title.strip() == '':
             flash('Title cannot be empty.', 'error')
-            return redirect(url_for('snippet', id='new'))
+            return redirect(url)
         if language.strip() == '':
             flash('Language cannot be empty.', 'error')
-            return redirect(url_for('snippet', id='new'))
+            return redirect(url)
         if code.strip() == '':
             flash('Code cannot be empty.', 'error')
-            return redirect(url_for('snippet', id='new'))
+            return redirect(url)
         if language not in self._LANGS:
             flash('Invalid language selected.', 'error')
-            return redirect(url_for('snippet', id='new'))  
+            return redirect(url)  
 
     def get_snippet_from_id(self, id, user_id):
         try:
@@ -73,7 +73,7 @@ class SnippetController:
         return snippets_arr
 
     def create_snippet(self, user_id, title, code, language):
-        validated = self.validate_snippet(title, code, language)
+        validated = self.validate_snippet(title, code, language, url_for('snippet', id='new'))
         if validated:
             return validated
         
