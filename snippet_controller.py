@@ -87,12 +87,26 @@ class SnippetController:
 
         return redirect(url_for('snippet', id=snippet.snippet_id))
     
-    def search_snippets(self, user_id, query, sort, include_code, fuzzy):
+    def search_snippets(self, user_id, query, sort, include_code, fuzzy, language, shared):
         con = self._get_db()
 
+        # Base SQL query
+        sql = "SELECT * FROM snippets WHERE user_id = ?"
+        params = [user_id]
+
+        # Dynamically build SQL query
+        if language:
+            sql += " AND language = ?"
+            params.append(language)
+
+        if shared == 'yes':
+            sql += " AND share_id IS NOT NULL"
+        elif shared == 'no':
+            sql += " AND share_id IS NULL"
+
+        # Get snippets
         if fuzzy:
-            sql = "SELECT * FROM snippets WHERE user_id = ?"
-            cur = con.execute(sql, (user_id,))
+            cur = con.execute(sql, tuple(params))
             snippets = cur.fetchall()
             
             filtered_snippets = []
@@ -103,26 +117,27 @@ class SnippetController:
 
             snippets = filtered_snippets
         else:
+            params.append(f'%{query}%')
             if include_code:
-                sql = "SELECT * FROM snippets WHERE user_id = ? AND (title LIKE ? OR code LIKE ?)"
-                cur = con.execute(sql, (user_id, f'%{query}%', f'%{query}%'))
+                sql += " AND (title LIKE ? OR code LIKE ?)"
+                params.append(f'%{query}%')
             else:
-                sql = "SELECT * FROM snippets WHERE user_id = ? AND title LIKE ?"
-                cur = con.execute(sql, (user_id, f'%{query}%'))
+                sql += " AND title LIKE ?"
 
+            cur = con.execute(sql, tuple(params))
             snippets = cur.fetchall()
 
+        # Get snippets as a list of dicts
         snippets_arr = []
         for snippet in snippets:
             snippets_arr.append(self._get_snippet_dict(snippet))
         
+        # Sort snippets
         match sort:
             case 'recent':
                 snippets_arr.sort(key=lambda x: x['modified_at'] or x['created_at'], reverse=True)
             case 'title':
                 snippets_arr.sort(key=lambda x: x['title'].lower())
-            case 'language':
-                snippets_arr.sort(key=lambda x: x['language'].lower())
 
         return render_template('library.html', snippets = snippets_arr)
 

@@ -89,8 +89,10 @@ def search_snippets():
     sort = request.args.get('sort', 'recent')
     include_code = request.args.get('include_code')
     fuzzy = request.args.get('fuzzy')
+    language = request.args.get('language', '')
+    shared = request.args.get('shared', '')
 
-    return controller.search_snippets(auth.user_id, query, sort, include_code, fuzzy)
+    return controller.search_snippets(auth.user_id, query, sort, include_code, fuzzy, language, shared)
 
 @app.route('/snippets/<int:id>/edit', methods=['GET', 'POST'])
 @auth.require_auth

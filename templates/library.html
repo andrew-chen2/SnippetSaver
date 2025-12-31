@@ -21,19 +21,40 @@
 </div>
 
 <!-- Search and Sort Controls -->
-<form class="d-flex gap-3 mb-3" method="get" action="/snippets/search">
+<form class="d-flex gap-3 mb-3 align-items-start" method="get" action="/snippets/search">
     <div class="flex-fill">
         <input type="search" name="q" class="form-control" placeholder="Search snippets..." value="{{ request.args.get('q', '') }}">
         <input type="checkbox" name="include_code" id="include_code" {% if request.args.get('include_code') %}checked{% endif %}>
-        <label for="include_code">Include code in search</label>
+        <label for="include_code" style="user-select: none;">Include code in search</label>
         <input type="checkbox" name="fuzzy" id="fuzzy" {% if request.args.get('fuzzy') %}checked{% endif %}>
-        <label for="fuzzy">Fuzzy search</label>
+        <label for="fuzzy" style="user-select: none;">Fuzzy search</label>
+    </div>
+    <div>
+        <select name="language" class="form-select">
+            <option value="">All languages</option>
+            <option value="python" {% if request.args.get('language') == 'python' %}selected{% endif %}>Python</option>
+            <option value="javascript" {% if request.args.get('language') == 'javascript' %}selected{% endif %}>JavaScript</option>
+            <option value="java" {% if request.args.get('language') == 'java' %}selected{% endif %}>Java</option>
+            <option value="cpp" {% if request.args.get('language') == 'cpp' %}selected{% endif %}>C++</option>
+            <option value="csharp" {% if request.args.get('language') == 'csharp' %}selected{% endif %}>C#</option>
+            <option value="html" {% if request.args.get('language') == 'html' %}selected{% endif %}>HTML</option>
+            <option value="other" {% if request.args.get('language') == 'other' %}selected{% endif %}>Other</option>
+        </select>
+    </div>
+    <div class="btn-group" role="group">
+        <input type="radio" class="btn-check" name="shared" id="all" value="" {% if not request.args.get('shared') %}checked{% endif %}>
+        <label class="btn btn-outline-secondary" for="all">All</label>
+
+        <input type="radio" class="btn-check" name="shared" id="shared" value="yes" {% if request.args.get('shared') == 'yes' %}checked{% endif %}>
+        <label class="btn btn-outline-secondary" for="shared">Shared</label>
+
+        <input type="radio" class="btn-check" name="shared" id="private" value="no" {% if request.args.get('shared') == 'no' %}checked{% endif %}>
+        <label class="btn btn-outline-secondary" for="private">Private</label>
     </div>
     <div>
         <select name="sort" class="form-select">
             <option value="recent" {% if request.args.get('sort') == 'recent' %}selected{% endif %}>Sort by: Most Recent</option>
             <option value="title" {% if request.args.get('sort') == 'title' %}selected{% endif %}>Sort by: Title (A-Z)</option>
-            <option value="language" {% if request.args.get('sort') == 'language' %}selected{% endif %}>Sort by: Language</option>
         </select>
     </div>
     <div>
