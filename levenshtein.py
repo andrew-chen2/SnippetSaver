@@ -1,29 +1,36 @@
 def levenshtein_dist(str1: str, str2: str) -> int:
-    m = len(str1)
-    n = len(str2)
+    # Get lengths of the strings
+    len1 = len(str1) + 1
+    len2 = len(str2) + 1
 
-    if m == 0 or n == 0:
-        return n or m
-
-    dp = [[0 for _ in range(n+1)] for _ in range(m+1)]
-
-    for i in range(m+1):
-        dp[i][0] = i
+    if len1 == 1 or len2 == 1:
+        # At least one string is empty so distance is the length of the other
+        return len2 - 1 or len1 - 1
     
-    for i in range(n+1):
-        dp[0][i] = i
+    # Initialize distance matrix
+    dist = [[0 for _ in range(len2)] for _ in range(len1)]
 
-    for i in range(1, m+1):
-        for j in range(1, n+1):
+    # Fill first row and column
+    for i in range(len1):
+        dist[i][0] = i
+
+    for i in range(len2):
+        dist[0][i] = i
+
+    for i in range(1, len1):
+        for j in range(1, len2):
             if str1[i-1] == str2[j-1]:
-                dp[i][j] = dp[i-1][j-1]
+                # Characters are the same so no cost
+                dist[i][j] = dist[i-1][j-1]
             else:
-                dp[i][j] = 1 + min(
-                    dp[i][j-1],
-                    dp[i-1][j],
-                    dp[i-1][j-1]
+                # Characters don't match so get minimum of insertion, deletion, substitution
+                dist[i][j] = 1 + min(
+                    dist[i][j-1],
+                    dist[i-1][j],
+                    dist[i-1][j-1]
                 )
-    return dp[m][n]
+    # Bottom-right cell contains the Levenshtein distance
+    return dist[len1-1][len2-1]
 
 def fuzzy_search(haystack: str, needle: str) -> bool:
     THRESHOLD = 0.3
