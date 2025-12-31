@@ -43,6 +43,7 @@
         <div class="border rounded">
             <textarea class="form-control bg-light" id="code" name="code"></textarea>
         </div>
+        <p style="color: red; display: none;" id="code-too-long">Code exceeds length limit.</p>
     </div>
 
     <div class="mb-3">
@@ -89,6 +90,7 @@
     const titleLabel = document.querySelector('label[for="title"]');
     const codeLabel = document.querySelector('label[for="code"]');
     const fileInput = document.getElementById('fileUpload');
+    const codeTooLong = document.getElementById('code-too-long');
     const modes = {
         python: "python",
         javascript: "javascript",
@@ -210,6 +212,9 @@
         const newLength = instance.getValue().length + change.text.join('\n').length - (change.to.ch - change.from.ch);
         if (newLength > 4000) {
             change.cancel();
+            codeTooLong.style.display = 'block';
+        } else {
+            codeTooLong.style.display = 'none';
         }
     });
 
