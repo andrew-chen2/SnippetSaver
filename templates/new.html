@@ -197,6 +197,7 @@
                 });
             });
 
+            editor.getWrapperElement().style.visibility = 'hidden';
             modal.classList.remove('d-none');
         }
     });
@@ -224,6 +225,7 @@
     });
 
     function closeModal() {
+        editor.getWrapperElement().style.visibility = 'visible';
         modal.classList.add('d-none');
         fileInput.value = null;
     }
