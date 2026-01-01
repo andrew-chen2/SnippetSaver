@@ -171,6 +171,8 @@ class SnippetController:
         abort(404)
 
     def get_detected_snippets(self, code, lang):
+        if not code.strip():
+            return []
         match lang:
             case 'python':
                 return detect_python_snippets(code)
