@@ -2,9 +2,9 @@ import re
 
 def detect_html_snippets(code: str) -> list:
     snippets = []
-    tags_to_detect = ['<head>', '<body>', '<script>', '<form>', '<nav>', '<header>', '<footer>', '<ul>', '<ol>', '<table>', '<style>', '<div>']
+    tags = ['<head>', '<body>', '<script>', '<form>', '<nav>', '<header>', '<footer>', '<ul>', '<ol>', '<table>', '<style>', '<div>']
 
-    for tag in tags_to_detect:
+    for tag in tags:
         start = 0
         closing_tag = tag.replace('<', '</')
         regex = f'<{tag[1:-1]}\\b[^>]*>|{closing_tag}'
