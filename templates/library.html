@@ -35,7 +35,6 @@
             <option value="python" {% if request.args.get('language') == 'python' %}selected{% endif %}>Python</option>
             <option value="javascript" {% if request.args.get('language') == 'javascript' %}selected{% endif %}>JavaScript</option>
             <option value="cpp" {% if request.args.get('language') == 'cpp' %}selected{% endif %}>C++</option>
-            <option value="csharp" {% if request.args.get('language') == 'csharp' %}selected{% endif %}>C#</option>
             <option value="html" {% if request.args.get('language') == 'html' %}selected{% endif %}>HTML</option>
             <option value="other" {% if request.args.get('language') == 'other' %}selected{% endif %}>Other</option>
         </select>
@@ -112,7 +111,6 @@
         Python: "python",
         JavaScript: "javascript",
         'C++': "text/x-c++src",
-        'C#': "text/x-csharp",
         HTML: "htmlmixed",
         Other: null,
         "": null

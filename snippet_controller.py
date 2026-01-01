@@ -11,7 +11,6 @@ class SnippetController:
         "python": 'Python',
         "javascript": 'JavaScript',
         "cpp": 'C++',
-        "csharp": 'C#',
         "html": 'HTML',
         "other": 'Other',
     }
