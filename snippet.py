@@ -71,6 +71,10 @@ class Snippet:
         con.execute(sql, (self.snippet_id, self.user_id))
         con.commit()
         self.snippet_id = None
+        self.title = None
+        self.code = None
+        self.language = None
+        self.share_id = None
 
     def share(self):
         if self.share_id:
