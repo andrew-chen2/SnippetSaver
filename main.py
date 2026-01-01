@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, g, session, redirect, url_for, abort
+from flask import Flask, render_template, request, g, session, redirect, url_for, abort, jsonify
 from sqlite3 import connect
 import os
 from auth import Auth
@@ -163,8 +163,8 @@ def get_snippets_from_code():
     code = request.json.get('code', '')
     lang = request.json.get('language', '')
     snippets = controller.get_detected_snippets(code, lang)
-    
-    return snippets
+
+    return jsonify(snippets)
 
 if __name__ == '__main__':
     app.run(debug=True)
