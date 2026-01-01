@@ -31,7 +31,7 @@ def detect_curly_brace_snippets(code: str, keywords: list) -> list:
                             # Extract snippet from keyword to closing brace
                             snippet = code[match.start():match.end()+stack[i][2]]
                             # Ignore snippets that are too long or too short
-                            if len(snippet.strip()) > 10000 or snippet.count('\n') < 1:
+                            if len(snippet.strip()) > 10000 or snippet.count('\n') < 2:
                                 found = True # Set found flag to true so it doesn't try to find more
                                 break # Break out of the for loop
                             snippets.append(snippet) # Add snippet to list
