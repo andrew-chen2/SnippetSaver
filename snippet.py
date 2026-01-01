@@ -37,7 +37,7 @@ class Snippet:
         if self.code.strip() == '':
             raise ValueError("Code cannot be empty.")
         if not self.language:
-            raise ValueError("Langage cannot be empty.")
+            raise ValueError("Language cannot be empty.")
         
         con = self._get_db()
 
