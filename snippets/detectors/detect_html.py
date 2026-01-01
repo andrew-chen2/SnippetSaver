@@ -19,7 +19,7 @@ def detect_html_snippets(code: str) -> list:
                 continue  # Skip if the parent is the same tag and no siblings
             snippet = element.prettify(formatter=formatter).strip('\n') # Convert Tag object to string
             # Ignore snippets that are too long or too short
-            if len(snippet.strip()) > 10000 or snippet.count('\n') < 2:
+            if len(snippet.strip()) > 10000 or snippet.count('\n') < 1:
                 continue
             snippets.append(snippet) # Add snippet to list
     
