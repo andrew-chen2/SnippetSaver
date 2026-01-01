@@ -136,7 +136,7 @@
                 selectWholeFile.disabled = false;
                 modalError.style.display = 'none';
             }
-            snippetOptions.innerHTML = '';
+            snippetOptions.innerHTML = 'Loading detected snippets...';
 
             fetch('/api/get_snippets_from_code', {
                 method: 'POST',
@@ -150,6 +150,8 @@
                     snippetOptions.innerHTML = '<p>No snippets detected in the uploaded file.</p>';
                     return;
                 }
+
+                snippetOptions.innerHTML = '';
 
                 data.forEach((snippet, index) => {
                     const col = document.createElement('div');
