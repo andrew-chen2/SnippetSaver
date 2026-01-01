@@ -34,7 +34,6 @@
             <option value="">All languages</option>
             <option value="python" {% if request.args.get('language') == 'python' %}selected{% endif %}>Python</option>
             <option value="javascript" {% if request.args.get('language') == 'javascript' %}selected{% endif %}>JavaScript</option>
-            <option value="java" {% if request.args.get('language') == 'java' %}selected{% endif %}>Java</option>
             <option value="cpp" {% if request.args.get('language') == 'cpp' %}selected{% endif %}>C++</option>
             <option value="csharp" {% if request.args.get('language') == 'csharp' %}selected{% endif %}>C#</option>
             <option value="html" {% if request.args.get('language') == 'html' %}selected{% endif %}>HTML</option>
@@ -112,7 +111,6 @@
     const modes = {
         Python: "python",
         JavaScript: "javascript",
-        Java: "text/x-java",
         'C++': "text/x-c++src",
         'C#': "text/x-csharp",
         HTML: "htmlmixed",
