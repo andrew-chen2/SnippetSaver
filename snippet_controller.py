@@ -195,6 +195,6 @@ class SnippetController:
         elif lang == 'cpp':
             return detect_cpp_snippets(code)
         elif lang == 'html':
-            detect_html_snippets(code)
+            return detect_html_snippets(code)
         else:
             return []
