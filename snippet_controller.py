@@ -130,11 +130,15 @@ class SnippetController:
             snippets_arr.append(self._get_snippet_dict(snippet))
         
         # Sort snippets
-        match sort:
+        """ match sort:
             case 'recent':
                 snippets_arr.sort(key=lambda x: x['modified_at'] or x['created_at'], reverse=True)
             case 'title':
-                snippets_arr.sort(key=lambda x: x['title'].lower())
+                snippets_arr.sort(key=lambda x: x['title'].lower()) """
+        if sort == 'recent':
+            snippets_arr.sort(key=lambda x: x['modified_at'] or x['created_at'], reverse=True)
+        elif sort == 'title':
+            snippets_arr.sort(key=lambda x: x['title'].lower())
 
         return render_template('library.html', snippets = snippets_arr)
 
@@ -173,7 +177,7 @@ class SnippetController:
     def get_detected_snippets(self, code, lang):
         if not code.strip():
             return []
-        match lang:
+        """ match lang:
             case 'python':
                 return detect_python_snippets(code)
             case 'javascript':
@@ -183,4 +187,14 @@ class SnippetController:
             case 'html':
                 return detect_html_snippets(code)
             case _:
-                return []
+                return [] """
+        if lang == 'python':
+            return detect_python_snippets(code)
+        elif lang == 'javascript':
+            return detect_javascript_snippets(code)
+        elif lang == 'cpp':
+            return detect_cpp_snippets(code)
+        elif lang == 'html':
+            detect_html_snippets(code)
+        else:
+            return []
