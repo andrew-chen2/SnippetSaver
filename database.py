@@ -1,8 +1,7 @@
 from sqlite3 import connect
 
-con = connect('snippetsaver.db')
-
 def create_table(name: str, columns: dict):
+    con = connect('snippetsaver.db')
     cols = ', '.join([f"{col} {' '.join(props)}" for col, props in columns.items()])
     sql = f"CREATE TABLE IF NOT EXISTS {name} ({cols})"
     con.execute(sql)
@@ -33,6 +32,7 @@ def init_tables():
 def delete_rows(tables: list):
     if not tables:
         return
+    con = connect('snippetsaver.db')
     for table in tables:
         sql = "SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?"
         if con.execute(sql, (table,)).fetchone():
