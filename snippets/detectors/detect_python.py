@@ -10,7 +10,7 @@ def detect_python_snippets(code: str) -> list:
             if isinstance(node, (ast.FunctionDef, ast.ClassDef, ast.For, ast.While, ast.Match)):
                 snippet = ast.get_source_segment(code, node) # Get substring of the code for the node
                 # Ignore snippets that are too long or too short
-                if len(snippet.strip()) > 10000 or snippet.count('\n') < 2:
+                if len(snippet.strip()) > 10000 or snippet.count('\n') < 1:
                     continue
                 snippets.append(snippet) # Add snippet to list
     except Exception:
